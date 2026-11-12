@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valve Pro Suite Enterprise v8.0 | سامانه جامع مهندسی خرید، متالورژی، استانداردهای ASME/API و CAD صنعتی</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            400: '#38bdf8',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0a3754',
+                            accent: '#38bdf8'
+                        }
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- External Libraries (Three.js, OrbitControls, SheetJS, Chart.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #060b14;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .cad-grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(to right, rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
+            background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+        }
+
+        .glass-panel {
+            background: rgba(13, 20, 36, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(56, 189, 248, 0.16);
+            box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.55);
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.35); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.65); }
+
+        .tab-btn {
+            position: relative;
+            color: #94a3b8;
+        }
+        .tab-btn:hover {
+            color: #e2e8f0;
+            background: rgba(30, 41, 59, 0.5);
+        }
+        .tab-btn.active {
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.09);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0284c7, #38bdf8);
+            box-shadow: 0 0 10px #38bdf8;
+        }
+        
+        .blueprint-grid {
+            background-color: #040a17;
+            background-image: 
+                linear-gradient(rgba(14, 165, 233, 0.14) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.14) 1px, transparent 1px),
+                linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+        }
+
+        @media print {
+            body { background: #fff !important; color: #000 !important; }
+            header, nav, .no-print { display: none !important; }
+            #datasheetModal { position: static !important; background: #fff !important; display: block !important; }
+            #datasheetModal > div { max-height: none !important; border: 1px solid #000 !important; box-shadow: none !important; background: #fff !important; color: #000 !important; }
+            #datasheetContent * { color: #000 !important; border-color: #333 !important; background: transparent !important; }
+        }
+    </style>
+</head>
+<body class="cad-grid-bg min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- TOP HEADER -->
+    <header class="glass-panel border-b border-slate-800/90 sticky top-0 z-40 px-4 py-2.5">
+        <div class="max-w-[1640px] mx-auto flex flex-col xl:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 w-full xl:w-auto justify-between xl:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-600 via-cyan-500 to-amber-400 flex items-center justify-center shadow-lg shadow-sky-500/25 border border-sky-300/30">
+                        <i class="fa-solid fa-industry text-xl text-slate-950"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-black text-lg text-white tracking-wider">VALVE PRO SUITE</h1>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold">v8.0 METALLURGY & SHOP-CAD</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">سامانه مهندسی خرید، متالورژی ASTM/API، جداول واقعی ASME B16.10/B16.34 و نقشه‌های کارگاهی سازندگان معتبر</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live FX Rates -->
+            <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+                <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700/80">
+                    <i class="fa-solid fa-dollar-sign text-emerald-400"></i>
+                    <span class="text-slate-400">USD/IRT:</span>
+                    <input type="number" id="fxUsdIrt" value="68000" step="500" class="w-20 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-emerald-400 font-bold focus:outline-none text-left" onchange="recalculateAll()">
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700/80">
+                    <i class="fa-solid fa-euro-sign text-cyan-400"></i>
+                    <span class="text-slate-400">EUR/USD:</span>
+                    <input type="number" id="fxEurUsd" value="1.08" step="0.01" class="w-14 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-cyan-400 font-bold focus:outline-none text-left" onchange="recalculateAll()">
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-slate-700/80">
+                    <span class="text-slate-400">واحد پول:</span>
+                    <select id="activeCurrency" class="bg-slate-950 text-brand-accent font-bold rounded px-2 py-0.5 border border-slate-700 focus:outline-none" onchange="recalculateAll()">
+                        <option value="USD" selected>USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="IRT">IRT (تومان)</option>
+                        <option value="IRR">IRR (ریال)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Global Controls -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openDatasheetModal()" class="px-3 py-1.5 rounded-lg bg-brand-600/30 hover:bg-brand-600/50 border border-brand-500/50 text-brand-accent text-xs font-bold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-file-contract"></i>
+                    <span>برگه مشخصات فنی (MR Datasheet)</span>
+                </button>
+                <button onclick="saveProjectToJSON()" class="px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-floppy-disk text-sky-400"></i>
+                    <span>ذخیره</span>
+                </button>
+                <button onclick="document.getElementById('importJsonInput').click()" class="px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-folder-open text-amber-400"></i>
+                    <span>فراخوانی</span>
+                </button>
+                <input type="file" id="importJsonInput" class="hidden" accept=".json" onchange="loadProjectFromJSON(event)">
+                <button onclick="exportToExcelFull()" class="px-3 py-1.5 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>خروجی Excel (MTO & BOM)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="bg-slate-900/95 border-b border-slate-800 px-4 sticky top-[62px] z-30">
+        <div class="max-w-[1640px] mx-auto flex gap-1 overflow-x-auto text-xs md:text-sm font-semibold">
+            <button onclick="switchTab('calculatorTab')" id="tab-calculatorTab" class="tab-btn active px-4 py-3 flex items-center gap-2 transition whitespace-nowrap">
+                <i class="fa-solid fa-sliders text-sky-400"></i>
+                <span>۱. مهندسی متریال، استاندارد و پیکربندی</span>
+            </button>
+            <button onclick="switchTab('viewerTab')" id="tab-viewerTab" class="tab-btn px-4 py-3 flex items-center gap-2 transition whitespace-nowrap">
+                <i class="fa-solid fa-cube text-amber-400"></i>
+                <span>۲. مدل سه‌بعدی کارگاهی (3D Cutaway/Exploded) و نقشه برش 2D</span>
+            </button>
+            <button onclick="switchTab('sizingTab')" id="tab-sizingTab" class="tab-btn px-4 py-3 flex items-center gap-2 transition whitespace-nowrap">
+                <i class="fa-solid fa-water text-cyan-400"></i>
+                <span>۳. سایزینگ هیدرولیک (ISA/IEC 60534 & Cavitation)</span>
+            </button>
+            <button onclick="switchTab('mtoTab')" id="tab-mtoTab" class="tab-btn px-4 py-3 flex items-center gap-2 transition whitespace-nowrap">
+                <i class="fa-solid fa-list-check text-emerald-400"></i>
+                <span>۴. مدیریت لیست خرید (MTO / BOQ)</span>
+                <span id="navMtoBadge" class="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">0</span>
+            </button>
+            <button onclick="switchTab('costTab')" id="tab-costTab" class="tab-btn px-4 py-3 flex items-center gap-2 transition whitespace-nowrap">
+                <i class="fa-solid fa-chart-pie text-purple-400"></i>
+                <span>۵. ساختار شکست هزینه (CBS)</span>
+            </button>
+            <button onclick="switchTab('standardsTab')" id="tab-standardsTab" class="tab-btn px-4 py-3 flex items-center gap-2 transition whitespace-nowrap">
+                <i class="fa-solid fa-book-open text-rose-400"></i>
+                <span>۶. جداول مرجع ASME B16.10 / B16.34 / API Trim و سازندگان</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-[1640px] w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- ===================================================================== -->
+        <!-- TAB 1: METALLURGY, STANDARDS & CONFIGURATOR                           -->
+        <!-- ===================================================================== -->
+        <div id="calculatorTab" class="tab-content space-y-6">
+            
+            <!-- Quick Valve Category Selector -->
+            <div class="glass-panel rounded-xl p-3 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-bold text-slate-400 px-2"><i class="fa-solid fa-layer-group text-brand-accent ml-1"></i>خانواده شیر صنعتی:</span>
+                <div class="flex flex-wrap gap-1.5" id="quickValveTypeBar"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Input Form (8 cols) -->
+                <div class="lg:col-span-8 glass-panel rounded-xl p-5 border border-slate-800 space-y-5">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-microscope text-brand-accent"></i>
+                            <span>مشخصات فنی، متالورژی و الزامات ساخت (Engineering & Metallurgy Spec)</span>
+                        </h2>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span id="applicableStdBadge" class="text-xs px-2.5 py-1 rounded bg-sky-950 text-sky-300 border border-sky-800 font-mono">API 600 / ASME B16.34</span>
+                            <span id="approvedVendorsBadge" class="text-[11px] px-2.5 py-1 rounded bg-amber-950/70 text-amber-300 border border-amber-700/60 font-mono">Vendors: Velan, Crane, Petrolvalves</span>
+                        </div>
+                    </div>
+
+                    <!-- Tag & Process Service -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                        <div>
+                            <label class="block text-slate-400 mb-1">شماره تگ (Valve Tag No)</label>
+                            <input type="text" id="valveTag" value="HV-1042A" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-amber-300 font-mono font-bold focus:border-brand-500 focus:outline-none text-left" dir="ltr" onchange="recalculateAll()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">شماره خط / پایپینگ کلاس</label>
+                            <input type="text" id="lineNumber" value="6&quot;-PG-102-A1A" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-200 font-mono focus:border-brand-500 focus:outline-none text-left" dir="ltr" onchange="recalculateAll()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">سیال فرآیندی (Process Fluid)</label>
+                            <select id="fluidService" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="Sweet Gas / Hydrocarbon">گاز شیرین / هیدروکربن</option>
+                                <option value="Sour Gas (H2S)">گاز ترش (H2S - الزام NACE MR0175)</option>
+                                <option value="Crude Oil">نفت خام سنگین (Crude Oil / Sand)</option>
+                                <option value="Sea Water / Brine">آب دریا / شورابه (کلراید بالا - Pitting)</option>
+                                <option value="High Temp Steam">بخار فوق داغ (Superheated Steam)</option>
+                                <option value="Cryogenic LNG">گاز مایع کرایوژنیک (LNG / N2 -196°C)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-bold text-emerald-400">تعداد (Qty)</label>
+                            <input type="number" id="inputQty" value="1" min="1" max="5000" class="w-full bg-slate-950 border border-emerald-600/50 rounded-lg p-2 text-emerald-400 font-mono font-bold focus:border-emerald-400 focus:outline-none text-center" onchange="recalculateAll()">
+                        </div>
+                    </div>
+
+                    <!-- Core Technical Parameters -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">نوع شیر (Valve Family)</label>
+                            <select id="valveType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="onValveTypeChange()">
+                                <option value="Gate" selected>Gate Valve (شیر کشویی)</option>
+                                <option value="Globe">Globe Valve (شیر کروی)</option>
+                                <option value="Ball">Ball Valve (شیر توپی)</option>
+                                <option value="Butterfly">Butterfly Valve (شیر پروانه‌ای)</option>
+                                <option value="Check">Check Valve (شیر یک‌طرفه)</option>
+                                <option value="Plug">Plug Valve (شیر مخروطی)</option>
+                                <option value="Needle">Needle / Manifold (سوزنی ابزاردقیق)</option>
+                                <option value="PSV">Safety Relief Valve (اطمینان PSV)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">طراحی و استاندارد ساخت (Design Standard)</label>
+                            <select id="valveSubType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">سایز نامی (NPS / DN)</label>
+                            <select id="valveSize" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none font-mono" onchange="recalculateAll()">
+                                <option value="0.5">1/2" (DN 15) - Forged</option>
+                                <option value="0.75">3/4" (DN 20) - Forged</option>
+                                <option value="1">1" (DN 25) - Forged</option>
+                                <option value="1.5">1.5" (DN 40) - Forged</option>
+                                <option value="2">2" (DN 50)</option>
+                                <option value="3">3" (DN 80)</option>
+                                <option value="4">4" (DN 100)</option>
+                                <option value="6" selected>6" (DN 150)</option>
+                                <option value="8">8" (DN 200)</option>
+                                <option value="10">10" (DN 250)</option>
+                                <option value="12">12" (DN 300)</option>
+                                <option value="14">14" (DN 350)</option>
+                                <option value="16">16" (DN 400)</option>
+                                <option value="18">18" (DN 450)</option>
+                                <option value="20">20" (DN 500)</option>
+                                <option value="24">24" (DN 600)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">کلاس فشاری (ASME B16.34 Class)</label>
+                            <select id="pressureClass" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none font-mono" onchange="recalculateAll()">
+                                <option value="150">ASME Class 150 (PN 20)</option>
+                                <option value="300" selected>ASME Class 300 (PN 50)</option>
+                                <option value="600">ASME Class 600 (PN 100)</option>
+                                <option value="800">ASME Class 800 (API 602 Forged)</option>
+                                <option value="900">ASME Class 900 (PN 150)</option>
+                                <option value="1500">ASME Class 1500 (PN 250)</option>
+                                <option value="2500">ASME Class 2500 (PN 420)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">متالورژی بدنه و بونت (Body / Bonnet ASTM)</label>
+                            <select id="bodyMaterial" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="A216-WCB" selected>ASTM A216 Gr. WCB (Cast CS - Group 1.1)</option>
+                                <option value="A105">ASTM A105N (Forged CS - Group 1.1)</option>
+                                <option value="A352-LCC">ASTM A352 Gr. LCC (Low-Temp CS -46°C - Gr 1.1)</option>
+                                <option value="A350-LF2">ASTM A350 Gr. LF2 Cl.1 (Low-Temp Forged - Gr 1.1)</option>
+                                <option value="A217-WC6">ASTM A217 Gr. WC6 (1.25Cr-0.5Mo - Gr 1.9)</option>
+                                <option value="A217-WC9">ASTM A217 Gr. WC9 (2.25Cr-1Mo - Gr 1.10)</option>
+                                <option value="A217-C12A">ASTM A217 Gr. C12A (9Cr-1Mo-V - Gr 1.15)</option>
+                                <option value="A351-CF8M">ASTM A351 Gr. CF8M (SS 316 Cast - Gr 2.2)</option>
+                                <option value="A182-F316">ASTM A182 Gr. F316/F316L (SS 316 Forged - Gr 2.2)</option>
+                                <option value="A890-4A">ASTM A890 Gr. 4A / UNS S31803 (Duplex - Gr 2.8)</option>
+                                <option value="A890-5A">ASTM A890 Gr. 5A / UNS S32750 (Super Duplex - Gr 2.8)</option>
+                                <option value="Inconel625">ASTM B564 UNS N06625 (Inconel 625 - Gr 3.8)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">تریم متریال داخلی (API 600 / 623 Trim)</label>
+                            <select id="trimNo" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="1">Trim 1: 13Cr (F6a Stem / 410 Disc & Seat)</option>
+                                <option value="5">Trim 5: Full Hardface (F6a Stem / Stellite 6 Seat & Disc)</option>
+                                <option value="8" selected>Trim 8: Half Hardface (F6a Stem / 13Cr Disc / Stellite 6 Seat)</option>
+                                <option value="10">Trim 10: Austenitic 316 (F316 Stem, Disc & Seat)</option>
+                                <option value="12">Trim 12: 316 + Stellite 6 (F316 Stem & Disc / Stellite Seat)</option>
+                                <option value="16">Trim 16: Monel 400 / K-500 (K-500 Stem / Monel + Stellite)</option>
+                                <option value="19">Trim 19: Inconel 625 / Alloy 20 (Sour & Corrosive)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">نوع اتصال انتها (End Connection)</label>
+                            <select id="endConnection" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="RF" selected>Flanged Raised Face (RF - ASME B16.5)</option>
+                                <option value="RTJ">Flanged Ring Type Joint (RTJ - ASME B16.5)</option>
+                                <option value="BW">Butt Weld Ends (BW - ASME B16.25)</option>
+                                <option value="SW">Socket Weld Ends (SW - ASME B16.11)</option>
+                                <option value="NPT">Threaded NPT (ASME B1.20.1)</option>
+                                <option value="Wafer">Wafer Lugless (ASME B16.5 / API 609)</option>
+                                <option value="Lug">Tapped Lug Type (API 609)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">عملگر / مکانیزم فرمان (Operator / Actuator)</label>
+                            <select id="operatorType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="Handwheel" selected>فلکه دستی (OS&Y Rising Stem Handwheel)</option>
+                                <option value="Gear">گیربکس حلزونی (Bevel / Worm Gearbox)</option>
+                                <option value="Lever">اهرم دستی قفل‌دار (Lockable Lever)</option>
+                                <option value="Pneumatic-SR">اکچوییتور پنوماتیک فنربرگشت (Scotch Yoke SR)</option>
+                                <option value="Pneumatic-DA">اکچوییتور پنوماتیک دوطرفه (Double Acting)</option>
+                                <option value="Electric-MOV">اکچوییتور برقی ضدانفجار (Rotork/AUMA MOV Ex-d)</option>
+                                <option value="BareStem">بدون عملگر (Bare Stem + ISO 5211 / MSS SP-102)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">آب‌بند نشیمنگاه و پکینگ (Seat & Packing)</label>
+                            <select id="seatMaterial" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="MetalStellite" selected>Metal-to-Metal: Stellite 6 (CoCr-A) + Graphite Packing</option>
+                                <option value="MetalTCC">Metal-to-Metal: HVOF Tungsten Carbide (TCC)</option>
+                                <option value="RPTFE">Soft Seat: RPTFE (15% Glass Filled) + PTFE/Graphite</option>
+                                <option value="Devlon">Soft Seat: Devlon V-API (High Pressure Ball Valve)</option>
+                                <option value="PEEK">Soft Seat: Virgin PEEK (-50 to +260°C)</option>
+                                <option value="PCTFE">Cryogenic Soft Seat: PCTFE / Kel-F (-196°C)</option>
+                                <option value="Viton">Elastomer Seat: Viton / FKM AED (Anti-Explosive Decompression)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">ساختار بونت / بدنه (Bonnet / Body Joint)</label>
+                            <select id="bonnetType" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white focus:border-brand-500 focus:outline-none" onchange="recalculateAll()">
+                                <option value="BB" selected>Bolted Bonnet (ASME B16.34 + Spiral Wound Gasket)</option>
+                                <option value="3PC">3-Piece Bolted Trunnion Body (API 6D)</option>
+                                <option value="WB">Welded Bonnet / Fully Welded Body (Zero Body Leakage)</option>
+                                <option value="PSB">Pressure Seal Bonnet (Class 900-2500 High Temp)</option>
+                                <option value="Cryo">Extended Bonnet with Vapor Column (BS 6364)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">دمای طراحی (°C)</label>
+                            <input type="number" id="designTemp" value="120" min="-196" max="650" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-amber-300 focus:border-brand-500 focus:outline-none font-mono" onchange="recalculateAll()">
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-400 mb-1 font-medium">فشار طراحی / کاری خط (Bar g)</label>
+                            <input type="number" id="operatingPressure" value="35" min="0" max="420" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-cyan-300 focus:border-brand-500 focus:outline-none font-mono" onchange="recalculateAll()">
+                        </div>
+                    </div>
+
+                    <!-- Metallurgical & Code Compliance Diagnostics -->
+                    <div id="engineeringAlertBox" class="hidden rounded-lg p-3 text-xs border flex flex-col gap-1.5"></div>
+
+                    <!-- NDT, Sour Service & QA/QC Checkboxes -->
+                    <div class="border-t border-slate-800 pt-3">
+                        <label class="block text-xs font-bold text-slate-300 mb-2">الزامات بازرسی، تست‌های غیرمخرب (NDT) و متالورژی تکمیلی (ITP / QCP):</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-slate-700">
+                                <input type="checkbox" id="chkNace" class="rounded bg-slate-950 border-slate-700 text-brand-500" onchange="recalculateAll()">
+                                <span class="text-slate-300">NACE MR0175 / ISO 15156 (Max 22 HRC)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-slate-700">
+                                <input type="checkbox" id="chkFugitive" class="rounded bg-slate-950 border-slate-700 text-brand-500" checked onchange="recalculateAll()">
+                                <span class="text-slate-300">ISO 15848-1 / API 624 Fugitive Emission</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-slate-700">
+                                <input type="checkbox" id="chkFireSafe" class="rounded bg-slate-950 border-slate-700 text-brand-500" checked onchange="recalculateAll()">
+                                <span class="text-slate-300">API 607 / API 6FA Fire-Safe Design</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-slate-700">
+                                <input type="checkbox" id="chkInconelOverlay" class="rounded bg-slate-950 border-slate-700 text-brand-500" onchange="recalculateAll()">
+                                <span class="text-slate-300">3mm Inconel 625 Weld Overlay (CRA)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-slate-700">
+                                <input type="checkbox" id="chkRT" class="rounded bg-slate-950 border-slate-700 text-brand-500" onchange="recalculateAll()">
+                                <span class="text-slate-300">ASME B16.34 Special Class (100% RT/UT + PMI)</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-slate-700">
+                                <input type="checkbox" id="chkCryoTest" class="rounded bg-slate-950 border-slate-700 text-brand-500" onchange="recalculateAll()">
+                                <span class="text-slate-300">BS 6364 / ISO 28921 Cryogenic Test</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="pt-2 flex flex-wrap justify-between items-center gap-3 border-t border-slate-800">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="switchTab('viewerTab');" class="px-3.5 py-2 rounded-lg bg-sky-500/20 border border-sky-500/40 text-sky-300 hover:bg-sky-500/30 font-bold text-xs flex items-center gap-2 transition">
+                                <i class="fa-solid fa-drafting-compass"></i>
+                                <span>مشاهده نقشه کارگاهی 3D و برش مقطعی</span>
+                            </button>
+                            <button onclick="switchTab('viewerTab'); setTimeout(enableExplodedView, 150);" class="px-3.5 py-2 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 font-bold text-xs flex items-center gap-2 transition">
+                                <i class="fa-solid fa-up-down-left-right"></i>
+                                <span>نمای انفجاری قطعات (Exploded BOM)</span>
+                            </button>
+                        </div>
+
+                        <button onclick="addCurrentValveToMTO()" class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition transform active:scale-95">
+                            <i class="fa-solid fa-plus-circle text-sm"></i>
+                            <span>افزودن به لیست خرید (MTO)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Telemetry Column (4 cols) -->
+                <div class="lg:col-span-4 space-y-4">
+                    
+                    <!-- Cost Card -->
+                    <div class="glass-panel rounded-xl p-4 border border-emerald-500/40 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/30 space-y-3">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-200 font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-coins text-emerald-400"></i>
+                                <span>برآورد بازرگانی و مهندسی (Budgetary Quote)</span>
+                            </span>
+                            <span id="ratingStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">ASME B16.34 OK</span>
+                        </div>
+                        
+                        <div class="p-3 rounded-lg bg-slate-950/80 border border-slate-800">
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-[11px] text-slate-400">قیمت واحد (Unit Price):</span>
+                                <span class="text-xl font-black font-mono text-emerald-400" id="unitPriceDisplay">$0.00</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400 text-left font-mono mt-0.5" id="unitPriceConvertedDisplay">0 تومان</div>
+                        </div>
+
+                        <div class="p-3 rounded-lg bg-brand-950/40 border border-brand-500/30">
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-[11px] text-sky-300 font-bold">جمع کل ردیف (<span id="lblBatchQty">1</span> عدد):</span>
+                                <span class="text-2xl font-black font-mono text-sky-400" id="batchPriceDisplay">$0.00</span>
+                            </div>
+                            <div class="text-xs text-amber-300 text-left font-mono mt-0.5 font-bold" id="batchPriceConvertedDisplay">0 تومان</div>
+                        </div>
+                    </div>
+
+                    <!-- ASME B16.34 & API 598 Test Telemetry -->
+                    <div class="glass-panel rounded-xl p-4 border border-slate-800 space-y-2.5">
+                        <h3 class="text-xs font-bold text-slate-200 flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span>فشار مجاز (ASME B16.34) و تست (API 598 / 6D)</span>
+                            <i class="fa-solid fa-gauge-high text-brand-accent"></i>
+                        </h3>
+
+                        <div class="space-y-1.5 text-xs font-mono">
+                            <div class="flex justify-between items-center p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="text-slate-400 font-vazir">گروه متریال ASME B16.34:</span>
+                                <span id="telemetryMatGroup" class="text-sky-300 font-bold">Group 1.1</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="text-slate-400 font-vazir">حداکثر فشار مجاز در دمای طراحی (MAWP):</span>
+                                <span id="telemetryMAWP" class="text-emerald-400 font-bold text-sm">46.2 Bar</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="text-slate-400 font-vazir">تست هیدرواستاتیک بدنه (Shell 1.5x CWP):</span>
+                                <span id="telemetryHydroTest" class="text-amber-400 font-bold">77.0 Bar</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="text-slate-400 font-vazir">تست نشیمنگاه (High-Press Seat 1.1x):</span>
+                                <span id="telemetrySeatTest" class="text-amber-300 font-bold">56.5 Bar</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="text-slate-400 font-vazir">ضریب جریان نامی (Full Open Cv / Kv):</span>
+                                <span id="telemetryCv" class="text-cyan-400 font-bold">1,296 / 1,121</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Real ASME B16.10 & B16.5 Dimensions -->
+                    <div class="glass-panel rounded-xl p-4 border border-slate-800 space-y-2.5">
+                        <h3 class="text-xs font-bold text-slate-200 flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span>ابعاد واقعی استاندارد (ASME B16.10 / B16.5)</span>
+                            <i class="fa-solid fa-ruler-combined text-brand-accent"></i>
+                        </h3>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                            <div class="p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="block text-slate-400 text-[10px] font-vazir">طول رو در رو (F2F - B16.10):</span>
+                                <span id="telemetryF2F" class="text-amber-300 font-bold text-sm">403 mm</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="block text-slate-400 text-[10px] font-vazir">قطر فلنج / پیچ‌ها (B16.5):</span>
+                                <span id="telemetryFlangeOD" class="text-white font-bold text-xs">320 mm (12x3/4")</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="block text-slate-400 text-[10px] font-vazir">ارتفاع مرکز تا بالا (H Open):</span>
+                                <span id="telemetryHeight" class="text-white font-bold text-sm">785 mm</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-900/70 border border-slate-800">
+                                <span class="block text-slate-400 text-[10px] font-vazir">وزن واحد / کل ردیف:</span>
+                                <span id="telemetryWeight" class="text-emerald-300 font-bold text-xs">165.0 kg</span>
+                            </div>
+                            <div class="p-2 rounded bg-slate-900/70 border border-slate-800 col-span-2 flex justify-between items-center">
+                                <span class="text-slate-400 text-[11px] font-vazir">گشتاور گسیختگی / تراست (MAST Check):</span>
+                                <span id="telemetryTorque" class="text-rose-400 font-bold text-xs">420 N.m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- TAB 2: REALISTIC 3D SHOP CAD & 2D CROSS-SECTIONAL DRAWING             -->
+        <!-- ===================================================================== -->
+        <div id="viewerTab" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- 3D Three.js View (8 cols) -->
+                <div class="lg:col-span-8 glass-panel rounded-xl p-4 border border-slate-800 flex flex-col h-[620px]">
+                    <div class="flex flex-wrap justify-between items-center pb-3 border-b border-slate-800 gap-2">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-cubes text-brand-accent"></i>
+                            <span>مدل‌سازی مهندسی کارگاهی (3D Assembly, Cutaway & Exploded CAD)</span>
+                        </h3>
+                        <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                            <button onclick="toggleCutawayView()" id="btnCutaway" class="px-2.5 py-1.5 rounded bg-sky-600/30 border border-sky-500/50 text-sky-300 hover:bg-sky-600/50 transition font-bold">
+                                <i class="fa-solid fa-scissors ml-1"></i>برش مقطعی (Half-Section)
+                            </button>
+                            <button onclick="toggleExplodedView()" id="btnExplode" class="px-2.5 py-1.5 rounded bg-amber-600/30 border border-amber-500/50 text-amber-300 hover:bg-amber-600/50 transition font-bold">
+                                <i class="fa-solid fa-up-down-left-right ml-1"></i>انفجاری (Exploded)
+                            </button>
+                            <button onclick="toggleWireframe()" id="btnWireframe" class="px-2.5 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                                <i class="fa-solid fa-border-none text-brand-accent ml-1"></i>Wireframe
+                            </button>
+                            <button onclick="toggleAutoRotate()" id="btnAutoRotate" class="px-2.5 py-1.5 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                                <i class="fa-solid fa-rotate text-cyan-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="threeContainer" class="flex-grow w-full relative rounded-lg bg-slate-950 overflow-hidden mt-3 border border-slate-900">
+                        <div id="cadOverlayBadge" class="absolute top-3 right-3 z-10 text-xs font-mono bg-slate-900/90 px-3 py-1.5 rounded-lg border border-sky-500/40 text-sky-300 shadow">
+                            Gate Valve 6" CL300
+                        </div>
+                        <div id="cadViewModeBadge" class="absolute top-3 left-3 z-10 text-[11px] font-mono bg-slate-900/90 px-2.5 py-1 rounded border border-amber-500/30 text-amber-300">
+                            Mode: Assembled Solid
+                        </div>
+                        <div class="absolute bottom-3 left-3 z-10 text-[10px] font-mono text-slate-300 bg-slate-900/90 p-2 rounded-lg border border-slate-800 flex gap-3">
+                            <span><i class="fa-solid fa-computer-mouse text-brand-accent ml-1"></i>چپ: چرخش ۳۶۰°</span>
+                            <span><i class="fa-solid fa-magnifying-glass-plus text-amber-400 ml-1"></i>اسکرول: زوم روی تریم داخلی</span>
+                            <span><i class="fa-solid fa-arrows-up-down-left-right text-emerald-400 ml-1"></i>راست: Pan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Metallurgical Part BOM List (4 cols) -->
+                <div class="lg:col-span-4 glass-panel rounded-xl p-4 border border-slate-800 flex flex-col h-[620px]">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <h3 class="text-xs font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-brand-accent"></i>
+                            <span>ریز اقلام و متالورژی استاندارد قطعات (Part List / BOM)</span>
+                        </h3>
+                        <span class="text-[10px] text-amber-300 font-mono" id="bomTrimBadge">API Trim 8</span>
+                    </div>
+                    <div class="flex-grow overflow-y-auto space-y-2 mt-3 text-xs pr-1" id="partsListContainer">
+                    </div>
+                </div>
+
+                <!-- 2D Engineering Cross-Sectional & GA Blueprint (12 cols) -->
+                <div class="lg:col-span-12 glass-panel rounded-xl p-4 border border-slate-800 flex flex-col h-[410px]">
+                    <div class="flex flex-wrap justify-between items-center pb-3 border-b border-slate-800 gap-2">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-drafting-compass text-amber-400"></i>
+                            <span>نقشه کارگاهی برش مقطعی و ابعادی (2D Cross-Sectional & GA Shop Drawing)</span>
+                        </h3>
+                        <span class="text-xs text-slate-400 font-mono">ASME B16.10 F2F / ASME B16.5 Flange / ISO 5211 Mounting Pad (mm)</span>
+                    </div>
+                    <div class="flex-grow w-full rounded-lg border border-slate-800 blueprint-grid p-2 flex items-center justify-center relative overflow-hidden mt-3" id="blueprintContainer">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- TAB 3: HYDRAULIC SIZING (ISA / IEC 60534)                             -->
+        <!-- ===================================================================== -->
+        <div id="sizingTab" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-faucet-drip text-cyan-400"></i>
+                        <span>پارامترهای فرآیندی سیال (ISA S75.01 / IEC 60534-2-1)</span>
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="col-span-2">
+                            <label class="block text-slate-400 mb-1">فاز سیال (Fluid Phase)</label>
+                            <select id="szPhase" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white" onchange="calculateHydraulicSizing()">
+                                <option value="liquid" selected>مایع تراکم‌ناپذیر (Liquid - Water/Hydrocarbon)</option>
+                                <option value="gas">گاز و بخار تراکم‌پذیر (Gas / Steam)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">دبی حجمی (Flow Rate m³/h)</label>
+                            <input type="number" id="szFlow" value="250" min="0.1" step="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-cyan-300 font-mono" oninput="calculateHydraulicSizing()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">چگالی نسبی (Specific Gravity SG)</label>
+                            <input type="number" id="szSG" value="0.82" min="0.01" max="5" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono" oninput="calculateHydraulicSizing()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">فشار ورودی P1 (Bar abs)</label>
+                            <input type="number" id="szP1" value="36.0" min="1" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-emerald-300 font-mono" oninput="calculateHydraulicSizing()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">فشار خروجی P2 (Bar abs)</label>
+                            <input type="number" id="szP2" value="34.2" min="0.1" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-amber-300 font-mono" oninput="calculateHydraulicSizing()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">فشار بخار سیال Pv (Bar abs)</label>
+                            <input type="number" id="szPv" value="1.2" min="0" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-300 font-mono" oninput="calculateHydraulicSizing()">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">ضریب بازیابی فشار (FL Factor)</label>
+                            <input type="number" id="szFL" value="0.88" min="0.5" max="0.98" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-300 font-mono" oninput="calculateHydraulicSizing()">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-slate-400 mb-1 flex justify-between">
+                                <span>درصد بازشدگی شیر برای شبیه‌سازی:</span>
+                                <span id="openPctValue" class="font-mono text-brand-accent font-bold">100%</span>
+                            </label>
+                            <input type="range" id="openPercentage" min="10" max="100" value="100" class="w-full accent-brand-500" oninput="document.getElementById('openPctValue').innerText = this.value + '%'; calculateHydraulicSizing(); recalculateAll();">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3 flex items-center justify-between">
+                        <span>نتایج تحلیل هیدرولیک، عدد کاویتاسیون (σ) و سرعت سیال</span>
+                        <span id="szCavitationBadge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">بدون کاویتاسیون (Safe)</span>
+                    </h3>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
+                        <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[10px] font-vazir">Cv مورد نیاز فرآیند:</span>
+                            <span id="szReqCv" class="text-lg font-black text-cyan-400">0.0</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[10px] font-vazir">Cv شیر در بازشدگی فعلی:</span>
+                            <span id="szAvailCv" class="text-lg font-black text-emerald-400">0.0</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[10px] font-vazir">سرعت سیال در گلوگاه (V):</span>
+                            <span id="szVelocity" class="text-lg font-black text-amber-400">0.0 m/s</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[10px] font-vazir">شاخص کاویتاسیون (Sigma σ):</span>
+                            <span id="szSigma" class="text-lg font-black text-purple-400">0.0</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-lg bg-slate-950/70 border border-slate-800 text-xs space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">اختلاف فشار مجاز قبل از Choked Flow (ΔP_max):</span>
+                            <span id="szDpMax" class="font-mono text-rose-400 font-bold">0.0 Bar</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">درصد ظرفیت استفاده شده شیر (Utilization):</span>
+                            <span id="szUtilization" class="font-mono text-sky-400 font-bold">0.0%</span>
+                        </div>
+                        <p id="szRecommendation" class="text-[11px] text-slate-300 pt-2 border-t border-slate-800/80 mt-2"></p>
+                    </div>
+
+                    <div class="h-[220px] w-full bg-slate-950/60 rounded-lg p-3 border border-slate-800">
+                        <canvas id="cvCurveChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- TAB 4: MTO / BOQ TABLE                                                -->
+        <!-- ===================================================================== -->
+        <div id="mtoTab" class="tab-content hidden space-y-5">
+            <div class="glass-panel rounded-xl p-4 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-base font-bold text-white">جدول جامع خرید و متره شیرآلات پروژه (Project Valve MTO / MR)</h2>
+                    <span id="mtoItemCount" class="px-2.5 py-0.5 text-xs rounded-full bg-brand-500/20 text-brand-accent font-mono font-bold">0 ردیف</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <button onclick="loadSampleProjectMTO()" class="px-3 py-2 rounded-lg bg-indigo-600/25 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5 transition font-semibold">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>بارگذاری لیست MTO پالایشگاهی نمونه</span>
+                    </button>
+                    <button onclick="document.getElementById('excelMtoInput').click()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-file-import text-amber-400"></i>
+                        <span>ایمپورت از Excel</span>
+                    </button>
+                    <input type="file" id="excelMtoInput" class="hidden" accept=".xlsx,.xls,.csv" onchange="handleMtoExcelUpload(event)">
+                    <button onclick="clearMtoTable()" class="px-3 py-2 rounded-lg bg-rose-950/50 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>حذف همه</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl border border-slate-800 overflow-x-auto">
+                <table class="w-full text-right text-xs">
+                    <thead class="bg-slate-900/95 text-slate-300 font-bold border-b border-slate-800">
+                        <tr>
+                            <th class="p-3">#</th>
+                            <th class="p-3">Tag No</th>
+                            <th class="p-3">نوع شیر و استاندارد</th>
+                            <th class="p-3">سایز</th>
+                            <th class="p-3">کلاس</th>
+                            <th class="p-3">بدنه / تریم / سیت</th>
+                            <th class="p-3">اتصال / عملگر</th>
+                            <th class="p-3 text-center">F2F (mm)</th>
+                            <th class="p-3 text-center">وزن کل (kg)</th>
+                            <th class="p-3 text-center">تعداد</th>
+                            <th class="p-3">قیمت واحد</th>
+                            <th class="p-3">قیمت کل ردیف</th>
+                            <th class="p-3 text-center">حذف</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mtoTableBody" class="divide-y divide-slate-800/60 font-mono text-slate-300">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="glass-panel rounded-xl p-5 border border-emerald-500/30 bg-gradient-to-l from-slate-900 to-emerald-950/20 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div>
+                    <span class="text-xs text-slate-400 block">مجموع کل برآورد مالی پروژه (Grand Total MTO Valuation):</span>
+                    <div id="mtoGrandTotalDisplay" class="text-3xl font-black text-emerald-400 font-mono mt-1">$0.00</div>
+                    <div id="mtoGrandTotalSecondary" class="text-xs text-slate-400 font-mono mt-0.5">0 تومان</div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-center font-mono text-xs bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="block text-slate-400 font-vazir text-[11px]">تعداد کل شیرآلات</span>
+                        <span id="mtoTotalQty" class="text-brand-accent font-black text-base">0</span>
+                    </div>
+                    <div class="border-x border-slate-800 px-4">
+                        <span class="block text-slate-400 font-vazir text-[11px]">وزن خالص محموله</span>
+                        <span id="mtoTotalWeight" class="text-amber-400 font-black text-base">0 kg</span>
+                    </div>
+                    <div>
+                        <span class="block text-slate-400 font-vazir text-[11px]">میانگین قیمت بر کیلو</span>
+                        <span id="mtoAvgPerKg" class="text-cyan-400 font-black text-base">$0.0/kg</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- TAB 5: COST BREAKDOWN STRUCTURE (CBS)                                 -->
+        <!-- ===================================================================== -->
+        <div id="costTab" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-5 glass-panel rounded-xl p-5 border border-slate-800 space-y-5">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3 flex items-center justify-between">
+                        <span>تنظیمات ضرایب ریخته‌گری/فورج، ماشین‌کاری و بازرگانی</span>
+                        <i class="fa-solid fa-sliders text-brand-accent"></i>
+                    </h3>
+
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>ماشین‌کاری CNC، جوشکاری Hardfacing و تست QA/QC:</span>
+                                <span id="lblCostMachining" class="font-mono text-brand-accent font-bold">22%</span>
+                            </div>
+                            <input type="range" id="sliderMachining" min="5" max="50" value="22" class="w-full accent-brand-500" oninput="document.getElementById('lblCostMachining').innerText = this.value + '%'; recalculateAll()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>سود سازنده، مهندسی و مدارک VDRL/MDR:</span>
+                                <span id="lblCostProfit" class="font-mono text-emerald-400 font-bold">18%</span>
+                            </div>
+                            <input type="range" id="sliderProfit" min="5" max="45" value="18" class="w-full accent-emerald-500" oninput="document.getElementById('lblCostProfit').innerText = this.value + '%'; recalculateAll()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>بسته‌بندی صادراتی (Seaworthy)، حمل و گمرک:</span>
+                                <span id="lblCostFreight" class="font-mono text-amber-400 font-bold">12%</span>
+                            </div>
+                            <input type="range" id="sliderFreight" min="0" max="35" value="12" class="w-full accent-amber-500" oninput="document.getElementById('lblCostFreight').innerText = this.value + '%'; recalculateAll()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-slate-300 mb-1">
+                                <span>مالیات و عوارض قانونی (VAT):</span>
+                                <span id="lblCostVat" class="font-mono text-rose-400 font-bold">10%</span>
+                            </div>
+                            <input type="range" id="sliderVat" min="0" max="20" value="10" class="w-full accent-rose-500" oninput="document.getElementById('lblCostVat').innerText = this.value + '%'; recalculateAll()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3 flex items-center justify-between">
+                        <span>تحلیل ساختار شکست هزینه (Unit Cost Breakdown Structure)</span>
+                        <i class="fa-solid fa-chart-pie text-emerald-400"></i>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                        <div class="md:col-span-7 space-y-2 text-xs font-mono" id="cbsBreakdownList">
+                        </div>
+                        <div class="md:col-span-5 h-[220px] flex items-center justify-center bg-slate-950/50 rounded-xl p-2 border border-slate-800">
+                            <canvas id="cbsDoughnutChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================== -->
+        <!-- TAB 6: REFERENCE STANDARDS, REAL TABLES & APPROVED VENDORS            -->
+        <!-- ===================================================================== -->
+        <div id="standardsTab" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- API Trim Reference -->
+                <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3">ماتریس متالورژی تریم شیرآلات (API 600 / API 623 Trim Matrix)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead class="bg-slate-900 text-slate-300">
+                                <tr>
+                                    <th class="p-2">Trim</th>
+                                    <th class="p-2">ساقه (Stem)</th>
+                                    <th class="p-2">دیسک/گوه (Disc/Wedge)</th>
+                                    <th class="p-2">نشیمنگاه (Seat Ring)</th>
+                                    <th class="p-2">سختی / استاندارد</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 font-mono text-slate-300 text-[11px]">
+                                <tr><td class="p-2 text-brand-accent font-bold">Trim 1</td><td class="p-2">ASTM A182 F6a</td><td class="p-2">13Cr (A217 CA15)</td><td class="p-2">13Cr (A276 410)</td><td class="p-2">Min 250 HB</td></tr>
+                                <tr class="bg-slate-900/40"><td class="p-2 text-brand-accent font-bold">Trim 5</td><td class="p-2">ASTM A182 F6a</td><td class="p-2">13Cr + Stellite 6</td><td class="p-2">Stellite 6 (CoCr-A)</td><td class="p-2">Min 350 HB</td></tr>
+                                <tr><td class="p-2 text-brand-accent font-bold">Trim 8</td><td class="p-2">ASTM A182 F6a</td><td class="p-2">13Cr (CA15)</td><td class="p-2">Stellite 6 Faced</td><td class="p-2">350 HB Seat / 250 Disc</td></tr>
+                                <tr class="bg-slate-900/40"><td class="p-2 text-brand-accent font-bold">Trim 10</td><td class="p-2">ASTM A182 F316</td><td class="p-2">CF8M / F316</td><td class="p-2">F316 / CF8M</td><td class="p-2">Solution Annealed</td></tr>
+                                <tr><td class="p-2 text-brand-accent font-bold">Trim 12</td><td class="p-2">ASTM A182 F316</td><td class="p-2">CF8M / F316</td><td class="p-2">316 + Stellite 6</td><td class="p-2">Min 350 HB Seat</td></tr>
+                                <tr class="bg-slate-900/40"><td class="p-2 text-brand-accent font-bold">Trim 16</td><td class="p-2">Monel K-500</td><td class="p-2">Monel 400</td><td class="p-2">Monel 400 + Stellite</td><td class="p-2">NACE Compliant</td></tr>
+                                <tr><td class="p-2 text-brand-accent font-bold">Trim 19</td><td class="p-2">Inconel 625</td><td class="p-2">Inconel 625 / Alloy 20</td><td class="p-2">Inconel 625 / Stellite</td><td class="p-2">Severe Sour / Chloride</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ASME B16.10 Face-to-Face Reference -->
+                <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3">جدول ابعاد واقعی طول رو در رو (ASME B16.10 Face-to-Face - mm)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-xs font-mono">
+                            <thead class="bg-slate-900 text-slate-300">
+                                <tr>
+                                    <th class="p-2 text-right">NPS</th>
+                                    <th class="p-2">Gate 150#</th>
+                                    <th class="p-2">Gate 300#</th>
+                                    <th class="p-2">Gate 600#</th>
+                                    <th class="p-2">Globe 300#</th>
+                                    <th class="p-2">Ball 300#</th>
+                                    <th class="p-2">BFV Wafer 150#</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 text-slate-300 text-[11px]">
+                                <tr><td class="p-2 text-right font-bold text-amber-300">2"</td><td>178</td><td>216</td><td>292</td><td>267</td><td>216</td><td>43</td></tr>
+                                <tr class="bg-slate-900/40"><td class="p-2 text-right font-bold text-amber-300">3"</td><td>203</td><td>283</td><td>356</td><td>318</td><td>283</td><td>46</td></tr>
+                                <tr><td class="p-2 text-right font-bold text-amber-300">4"</td><td>229</td><td>305</td><td>432</td><td>356</td><td>305</td><td>52</td></tr>
+                                <tr class="bg-slate-900/40"><td class="p-2 text-right font-bold text-amber-300">6"</td><td>267</td><td>403</td><td>559</td><td>444</td><td>403</td><td>56</td></tr>
+                                <tr><td class="p-2 text-right font-bold text-amber-300">8"</td><td>292</td><td>419</td><td>660</td><td>559</td><td>419</td><td>60</td></tr>
+                                <tr class="bg-slate-900/40"><td class="p-2 text-right font-bold text-amber-300">12"</td><td>356</td><td>502</td><td>838</td><td>711</td><td>502</td><td>78</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Approved Manufacturers (AVL) Matrix -->
+                <div class="glass-panel rounded-xl p-5 border border-slate-800 space-y-4 lg:col-span-2">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3">فهرست سازندگان معتبر بین‌المللی مرجع نقشه‌ها و استانداردها (Approved Vendor List - AVL)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                        <div class="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
+                            <div class="font-bold text-sky-400 mb-1">Gate / Globe / Check (API 600/602/623)</div>
+                            <p class="text-slate-300 font-mono text-[11px]">Velan (Canada), Crane ChemPharma, Bonney Forge (Italy), OMB Valves, Petrolvalves, Goodwin International</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
+                            <div class="font-bold text-amber-400 mb-1">Ball & Slab Gate Valves (API 6D)</div>
+                            <p class="text-slate-300 font-mono text-[11px]">Cameron (SLB), Petrolvalves (Italy), Perar, Grove, Valvitalia, KITZ Corporation, Pietro Fiorentini</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
+                            <div class="font-bold text-cyan-400 mb-1">Butterfly & Axial Check (API 609/594)</div>
+                            <p class="text-slate-300 font-mono text-[11px]">Vanessa (Emerson TOV), Adams Armaturen, Mokveld (Axial Nozzle Check), Goodwin, Bray / Keystone</p>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
+                            <div class="font-bold text-rose-400 mb-1">Safety Relief & Instrument (API 526 / MSS SP-99)</div>
+                            <p class="text-slate-300 font-mono text-[11px]">Crosby (Emerson), Consolidated (Baker Hughes), Leser (Germany), Swagelok, Parker Hannifin</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- DATASHEET MODAL -->
+    <div id="datasheetModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-4xl rounded-2xl border border-brand-500/40 overflow-hidden flex flex-col max-h-[92vh]">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-file-shield text-brand-accent text-xl"></i>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">برگه مشخصات فنی و مهندسی خرید شیرآلات (MATERIAL REQUISITION DATASHEET)</h3>
+                        <p class="text-[10px] text-slate-400 font-mono">ASME B16.34 / B16.10 / B16.5 / API Certified Engineering Spec</p>
+                    </div>
+                </div>
+                <button onclick="closeDatasheetModal()" class="text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800 no-print"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-4 font-mono text-xs text-slate-300" id="datasheetContent">
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900 flex justify-between items-center no-print">
+                <span class="text-[11px] text-slate-400">آماده چاپ مستقیم یا ذخیره به صورت PDF جهت ارسال به سازندگان (RFQ / TBE)</span>
+                <button onclick="window.print()" class="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-bold flex items-center gap-2 transition shadow-lg">
+                    <i class="fa-solid fa-print"></i>
+                    <span>چاپ / ذخیره PDF دیتاشیت</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ENGINE -->
+    <script>
+        let mtoItems = [];
+        let scene, camera, renderer, currentMeshGroup, controls;
+        let isWireframe = false;
+        let isExploded = false;
+        let isCutaway = false;
+        let isAutoRotate = false;
+        let cbsChart = null;
+        let cvChart = null;
+
+        /* ========================================================================= */
+        /* 1. REAL ENGINEERING CATALOG & APPROVED VENDORS                            */
+        /* ========================================================================= */
+        const VALVE_CATALOG = {
+            Gate: {
+                label: 'Gate Valve (کشویی)',
+                std: 'API 600 (≥2") / API 602 (<2") / API 6D',
+                vendors: 'Velan, Crane, Bonney Forge, Petrolvalves, Goodwin',
+                subtypes: [
+                    'API 600 Bolted Bonnet - Flexible Wedge OS&Y (کشویی گوه انعطاف‌پذیر)',
+                    'API 602 Forged Steel - Solid Wedge OS&Y (فورج سایز کوچک)',
+                    'API 6D Through-Conduit Slab Gate (اسلب تمام گذر خط لوله)',
+                    'API 6D Double Expanding Gate Valve (گوه بازشونده DBB)',
+                    'ASME B16.34 Pressure Seal Bonnet Gate (بونت خودآب‌بند فشار قوی)'
+                ]
+            },
+            Globe: {
+                label: 'Globe Valve (کروی)',
+                std: 'BS 1873 / API 623 / API 602 / ASME B16.34',
+                vendors: 'Velan, Crane, Bonney Forge, OMB, KSB',
+                subtypes: [
+                    'API 623 / BS 1873 Straight Pattern - Conical/Parabolic Plug (مستقیم)',
+                    'Y-Pattern High-Pressure Globe Valve (طرح Y افت فشار کم)',
+                    'Angle Pattern 90° Globe Valve (طرح زاویه‌ای)',
+                    'Bellows Sealed Zero-Emission Globe (آب‌بندی بیلوز فلزی)'
+                ]
+            },
+            Ball: {
+                label: 'Ball Valve (توپی)',
+                std: 'API 6D / ISO 17292 / ASME B16.34',
+                vendors: 'Cameron (SLB), Petrolvalves, Perar, Grove, Valvitalia, KITZ',
+                subtypes: [
+                    'ISO 17292 Floating Ball - 2-Piece Split Body (توپی شناور دو تکه)',
+                    'API 6D Trunnion Mounted - 3-Piece Bolted Body (ترونیون سه تکه)',
+                    'API 6D Top Entry Ball Valve (دسترسی از بالا - تعمیر در خط)',
+                    'API 6D Fully Welded Pipeline Ball Valve (تمام جوشی خط لوله)',
+                    'BS 6364 Cryogenic Extended Bonnet Ball Valve (کرایوژنیک)'
+                ]
+            },
+            Butterfly: {
+                label: 'Butterfly Valve (پروانه‌ای)',
+                std: 'API 609 Cat. A & B / ASME B16.34',
+                vendors: 'Vanessa (Emerson), Adams, Bray/Keystone, Goodwin',
+                subtypes: [
+                    'API 609 Cat. B - Triple Offset Metal-Seated (TOV - تریپل آفست فلزی)',
+                    'API 609 Cat. B - Double Offset High Performance (دابل آفست)',
+                    'API 609 Cat. A - Concentric Wafer Type (ویفر هم‌مرکز)',
+                    'API 609 Cat. A - Concentric Lug Type (لاگ رزوه‌دار)',
+                    'Double Flanged Short/Long Pattern TOV (دو سر فلنج)'
+                ]
+            },
+            Check: {
+                label: 'Check Valve (یک‌طرفه)',
+                std: 'API 594 / BS 1868 / API 6D',
+                vendors: 'Goodwin, Mokveld, Velan, Crane, Petrolvalves',
+                subtypes: [
+                    'BS 1868 / API 6D Swing Check - Bolted Cover (لولایی درپوش پیچ‌دار)',
+                    'API 594 Dual Plate Wafer / Lug Check (دو لنگه ویفر فنردار)',
+                    'Mokveld Style Axial Flow Nozzle Check (نازلی جریان محوری بدون ضربه قوچ)',
+                    'API 602 Piston / Ball Lift Check Valve (پیستونی سایز کوچک)'
+                ]
+            },
+            Plug: {
+                label: 'Plug Valve (مخروطی)',
+                std: 'API 599 / API 6D / ASME B16.34',
+                vendors: 'Nordstrom (Flowserve), Cameron, Tuflin (Crane), Serck Audco',
+                subtypes: [
+                    'API 599 Pressure-Balanced Lubricated Plug (روغن‌کاری شونده بالانس)',
+                    'PTFE Sleeved Non-Lubricated Plug Valve (اسلیو تفلونی)',
+                    'DBB Twin-Seal / Orbit Rising Stem Plug Valve (دابل بلاک و بلید)'
+                ]
+            },
+            Needle: {
+                label: 'Needle / Manifold (سوزنی)',
+                std: 'MSS SP-99 / ASME B16.34',
+                vendors: 'Swagelok, Parker Hannifin, Oliver Valves, DK-Lok',
+                subtypes: [
+                    'MSS SP-99 Barstock Straight Needle Valve (سوزنی مستقیم ابزاردقیق)',
+                    '2-Valve Instrument Block & Bleed Manifold (منیفولد ۲ راهه)',
+                    '5-Valve Differential Pressure (DP) Manifold (منیفولد ۵ راهه)'
+                ]
+            },
+            PSV: {
+                label: 'Safety Relief (اطمینان PSV)',
+                std: 'API 526 / API 520 / ASME Sec. VIII Div.1',
+                vendors: 'Crosby (Emerson), Consolidated (Baker Hughes), Leser',
+                subtypes: [
+                    'API 526 Conventional Spring-Loaded PSV (فنری معمولی)',
+                    'API 526 Balanced Bellows PSV (دارای بیلوز متعادل‌کننده فشار برگشتی)',
+                    'API 526 Pilot Operated Safety Relief Valve (پایلوت‌دار)'
+                ]
+            }
+        };
+
+        /* ========================================================================= */
+        /* 2. REAL ASME B16.10 FACE-TO-FACE TABLE (mm)                                */
+        /* ========================================================================= */
+        const ASME_B16_10_F2F = {
+            // size: { class: mm }
+            Gate: {
+                0.5: {150:108, 300:140, 600:165, 800:100, 900:216, 1500:216, 2500:264},
+                0.75:{150:117, 300:152, 600:190, 800:110, 900:229, 1500:229, 2500:273},
+                1:   {150:127, 300:165, 600:216, 800:120, 900:254, 1500:254, 2500:308},
+                1.5: {150:165, 300:190, 600:241, 800:140, 900:305, 1500:305, 2500:384},
+                2:   {150:178, 300:216, 600:292, 800:292, 900:368, 1500:368, 2500:451},
+                3:   {150:203, 300:283, 600:356, 800:356, 900:381, 1500:470, 2500:578},
+                4:   {150:229, 300:305, 600:432, 800:432, 900:457, 1500:546, 2500:673},
+                6:   {150:267, 300:403, 600:559, 800:559, 900:610, 1500:705, 2500:914},
+                8:   {150:292, 300:419, 600:660, 800:660, 900:737, 1500:832, 2500:1022},
+                10:  {150:330, 300:457, 600:787, 800:787, 900:838, 1500:991, 2500:1270},
+                12:  {150:356, 300:502, 600:838, 800:838, 900:965, 1500:1130, 2500:1422},
+                14:  {150:381, 300:762, 600:889, 800:889, 900:1029,1500:1257, 2500:1550},
+                16:  {150:406, 300:838, 600:991, 800:991, 900:1130,1500:1384, 2500:1700},
+                18:  {150:432, 300:914, 600:1092,800:1092,900:1219,1500:1537, 2500:1850},
+                20:  {150:457, 300:991, 600:1194,800:1194,900:1321,1500:1664, 2500:2000},
+                24:  {150:508, 300:1143,600:1397,800:1397,900:1549,1500:1943, 2500:2300}
+            },
+            Globe: {
+                0.5: {150:108, 300:152, 600:165, 800:100, 900:216, 1500:216, 2500:264},
+                0.75:{150:117, 300:178, 600:190, 800:110, 900:229, 1500:229, 2500:273},
+                1:   {150:127, 300:203, 600:216, 800:120, 900:254, 1500:254, 2500:308},
+                1.5: {150:165, 300:229, 600:241, 800:140, 900:305, 1500:305, 2500:384},
+                2:   {150:203, 300:267, 600:292, 800:292, 900:368, 1500:368, 2500:451},
+                3:   {150:241, 300:318, 600:356, 800:356, 900:381, 1500:470, 2500:578},
+                4:   {150:292, 300:356, 600:432, 800:432, 900:457, 1500:546, 2500:673},
+                6:   {150:406, 300:444, 600:559, 800:559, 900:610, 1500:705, 2500:914},
+                8:   {150:495, 300:559, 600:660, 800:660, 900:737, 1500:832, 2500:1022},
+                10:  {150:622, 300:622, 600:787, 800:787, 900:838, 1500:991, 2500:1270},
+                12:  {150:698, 300:711, 600:838, 800:838, 900:965, 1500:1130, 2500:1422},
+                14:  {150:787, 300:838, 600:889, 800:889, 900:1029,1500:1257, 2500:1550},
+                16:  {150:914, 300:864, 600:991, 800:991, 900:1130,1500:1384, 2500:1700},
+                18:  {150:978, 300:978, 600:1092,800:1092,900:1219,1500:1537, 2500:1850},
+                20:  {150:978, 300:1016,600:1194,800:1194,900:1321,1500:1664, 2500:2000},
+                24:  {150:1295,300:1346,600:1397,800:1397,900:1549,1500:1943, 2500:2300}
+            },
+            Ball: {
+                0.5: {150:108, 300:140, 600:165, 800:105, 900:216, 1500:216, 2500:264},
+                0.75:{150:117, 300:152, 600:190, 800:115, 900:229, 1500:229, 2500:273},
+                1:   {150:127, 300:165, 600:216, 800:125, 900:254, 1500:254, 2500:308},
+                1.5: {150:165, 300:190, 600:241, 800:150, 900:305, 1500:305, 2500:384},
+                2:   {150:178, 300:216, 600:292, 800:292, 900:368, 1500:368, 2500:451},
+                3:   {150:203, 300:283, 600:356, 800:356, 900:381, 1500:470, 2500:578},
+                4:   {150:229, 300:305, 600:432, 800:432, 900:457, 1500:546, 2500:673},
+                6:   {150:394, 300:403, 600:559, 800:559, 900:610, 1500:705, 2500:914},
+                8:   {150:457, 300:502, 600:660, 800:660, 900:737, 1500:832, 2500:1022},
+                10:  {150:533, 300:568, 600:787, 800:787, 900:838, 1500:991, 2500:1270},
+                12:  {150:610, 300:648, 600:838, 800:838, 900:965, 1500:1130, 2500:1422},
+                14:  {150:686, 300:762, 600:889, 800:889, 900:1029,1500:1257, 2500:1550},
+                16:  {150:762, 300:838, 600:991, 800:991, 900:1130,1500:1384, 2500:1700},
+                18:  {150:864, 300:914, 600:1092,800:1092,900:1219,1500:1537, 2500:1850},
+                20:  {150:914, 300:991, 600:1194,800:1194,900:1321,1500:1664, 2500:2000},
+                24:  {150:1067,300:1143,600:1397,800:1397,900:1549,1500:1943, 2500:2300}
+            },
+            Butterfly: {
+                // API 609 Wafer/Lug dimensions
+                2:   {150:43,  300:43,  600:48,  800:48,  900:60,  1500:70,  2500:85},
+                3:   {150:46,  300:48,  600:54,  800:54,  900:68,  1500:80,  2500:95},
+                4:   {150:52,  300:54,  600:64,  800:64,  900:78,  1500:92,  2500:110},
+                6:   {150:56,  300:59,  600:78,  800:78,  900:95,  1500:115, 2500:135},
+                8:   {150:60,  300:73,  600:102, 800:102, 900:125, 1500:145, 2500:170},
+                10:  {150:68,  300:83,  600:117, 800:117, 900:145, 1500:170, 2500:200},
+                12:  {150:78,  300:92,  600:140, 800:140, 900:170, 1500:200, 2500:235},
+                14:  {150:78,  300:117, 600:155, 800:155, 900:190, 1500:225, 2500:260},
+                16:  {150:102, 300:133, 600:178, 800:178, 900:215, 1500:255, 2500:295},
+                18:  {150:114, 300:149, 600:200, 800:200, 900:240, 1500:285, 2500:330},
+                20:  {150:127, 300:159, 600:216, 800:216, 900:265, 1500:315, 2500:365},
+                24:  {150:154, 300:181, 600:232, 800:232, 900:300, 1500:360, 2500:415}
+            }
+        };
+
+        /* ========================================================================= */
+        /* 3. REAL ASME B16.5 FLANGE OD & BOLT SPECIFICATION TABLE                   */
+        /* ========================================================================= */
+        const ASME_B16_5_FLANGES = {
+            0.5:  {150:{od:90, bolts:'4x1/2"'},  300:{od:95, bolts:'4x1/2"'},  600:{od:95, bolts:'4x1/2"'},  900:{od:120,bolts:'4x3/4"'}, 1500:{od:120,bolts:'4x3/4"'}},
+            0.75: {150:{od:100,bolts:'4x1/2"'},  300:{od:115,bolts:'4x5/8"'},  600:{od:115,bolts:'4x5/8"'},  900:{od:130,bolts:'4x3/4"'}, 1500:{od:130,bolts:'4x3/4"'}},
+            1:    {150:{od:110,bolts:'4x1/2"'},  300:{od:125,bolts:'4x5/8"'},  600:{od:125,bolts:'4x5/8"'},  900:{od:150,bolts:'4x7/8"'}, 1500:{od:150,bolts:'4x7/8"'}},
+            1.5:  {150:{od:125,bolts:'4x1/2"'},  300:{od:155,bolts:'4x3/4"'},  600:{od:155,bolts:'4x3/4"'},  900:{od:180,bolts:'4x1"'},   1500:{od:180,bolts:'4x1"'}},
+            2:    {150:{od:150,bolts:'4x5/8"'},  300:{od:165,bolts:'8x5/8"'},  600:{od:165,bolts:'8x5/8"'},  900:{od:215,bolts:'8x7/8"'}, 1500:{od:215,bolts:'8x7/8"'}},
+            3:    {150:{od:190,bolts:'4x5/8"'},  300:{od:210,bolts:'8x3/4"'},  600:{od:210,bolts:'8x3/4"'},  900:{od:240,bolts:'8x7/8"'}, 1500:{od:265,bolts:'8x1-1/8"'}},
+            4:    {150:{od:230,bolts:'8x5/8"'},  300:{od:255,bolts:'8x3/4"'},  600:{od:275,bolts:'8x7/8"'},  900:{od:290,bolts:'8x1-1/8"'},1500:{od:310,bolts:'8x1-1/4"'}},
+            6:    {150:{od:280,bolts:'8x3/4"'},  300:{od:320,bolts:'12x3/4"'}, 600:{od:355,bolts:'12x1"'},   900:{od:380,bolts:'12x1-1/8"'},1500:{od:395,bolts:'12x1-3/8"'}},
+            8:    {150:{od:345,bolts:'8x3/4"'},  300:{od:380,bolts:'12x7/8"'}, 600:{od:420,bolts:'12x1-1/8"'},900:{od:470,bolts:'12x1-3/8"'},1500:{od:485,bolts:'12x1-5/8"'}},
+            10:   {150:{od:405,bolts:'12x7/8"'}, 300:{od:445,bolts:'16x1"'},   600:{od:510,bolts:'16x1-1/4"'},900:{od:545,bolts:'16x1-3/8"'},1500:{od:585,bolts:'12x1-7/8"'}},
+            12:   {150:{od:485,bolts:'12x7/8"'}, 300:{od:520,bolts:'16x1-1/8"'},600:{od:560,bolts:'20x1-1/4"'},900:{od:610,bolts:'20x1-3/8"'},1500:{od:675,bolts:'16x2"'}},
+            14:   {150:{od:535,bolts:'12x1"'},   300:{od:585,bolts:'20x1-1/8"'},600:{od:605,bolts:'20x1-3/8"'},900:{od:640,bolts:'20x1-1/2"'},1500:{od:750,bolts:'16x2-1/4"'}},
+            16:   {150:{od:595,bolts:'16x1"'},   300:{od:650,bolts:'20x1-1/4"'},600:{od:685,bolts:'20x1-1/2"'},900:{od:705,bolts:'20x1-5/8"'},1500:{od:825,bolts:'16x2-1/2"'}},
+            18:   {150:{od:635,bolts:'16x1-1/8"'},300:{od:710,bolts:'24x1-1/4"'},600:{od:745,bolts:'20x1-5/8"'},900:{od:785,bolts:'20x1-7/8"'},1500:{od:915,bolts:'16x2-3/4"'}},
+            20:   {150:{od:700,bolts:'20x1-1/8"'},300:{od:775,bolts:'24x1-1/4"'},600:{od:815,bolts:'24x1-5/8"'},900:{od:855,bolts:'20x2"'},   1500:{od:985,bolts:'16x3"'}},
+            24:   {150:{od:815,bolts:'20x1-1/4"'},300:{od:915,bolts:'24x1-1/2"'},600:{od:940,bolts:'24x1-7/8"'},900:{od:1040,bolts:'20x2-1/2"'},1500:{od:1170,bolts:'16x3-1/2"'}}
+        };
+
+        /* ========================================================================= */
+        /* 4. REAL API TRIM METALLURGY MATRIX                                        */
+        /* ========================================================================= */
+        const API_TRIM_MATRIX = {
+            1:  { name: 'Trim 1 (13Cr)', stem: 'ASTM A182 F6a Cl.2 (13Cr)', disc: 'ASTM A217 CA15 / F6a', seat: 'ASTM A276 410 (Min 250 HB)', gasket: '304SS + Graphite Spiral Wound' },
+            5:  { name: 'Trim 5 (Full Stellite 6)', stem: 'ASTM A182 F6a Cl.2', disc: '13Cr + Stellite 6 Overlay', seat: 'Stellite 6 (CoCr-A, Min 350 HB)', gasket: '316SS + Graphite Spiral Wound' },
+            8:  { name: 'Trim 8 (13Cr / Stellite 6)', stem: 'ASTM A182 F6a Cl.2', disc: '13Cr (CA15 / F6a)', seat: 'ASTM A105/410 + Stellite 6 Faced', gasket: '304SS + Graphite Spiral Wound' },
+            10: { name: 'Trim 10 (Austenitic 316)', stem: 'ASTM A182 F316 / F316L', disc: 'ASTM A351 CF8M / F316', seat: 'ASTM A182 F316 / CF8M', gasket: '316SS + PTFE/Graphite' },
+            12: { name: 'Trim 12 (316 + Stellite 6)', stem: 'ASTM A182 F316 / XM-19', disc: 'ASTM A351 CF8M / F316', seat: 'F316 + Stellite 6 Hardfaced', gasket: '316SS + Graphite Spiral Wound' },
+            16: { name: 'Trim 16 (Monel 400 / K-500)', stem: 'Monel K-500 (UNS N05500)', disc: 'Monel 400 (UNS N04400)', seat: 'Monel 400 + Stellite 6 Faced', gasket: 'Monel 400 + Graphite' },
+            19: { name: 'Trim 19 (Inconel 625 CRA)', stem: 'Inconel 625 / 718', disc: 'Inconel 625 (UNS N06625)', seat: 'Inconel 625 + Stellite 6 / TCC', gasket: 'Inconel 625 + Graphite' }
+        };
+
+        /* ========================================================================= */
+        /* 5. REAL ASME B16.34 PRESSURE-TEMPERATURE RATING ENGINE                    */
+        /* ========================================================================= */
+        function getAsmeB1634Rating(material, pClass, tempC) {
+            let group = 'Group 1.1 (C-Mn-Si Steel)';
+            let cwp = {150:19.6, 300:51.1, 600:102.1, 800:136.1, 900:153.2, 1500:255.3, 2500:425.5}[pClass] || 51.1;
+            let maxTemp = 425;
+
+            if (material.includes('WC6') || material.includes('WC9') || material.includes('C12A')) {
+                group = material.includes('WC6') ? 'Group 1.9 (1.25Cr-0.5Mo)' : (material.includes('WC9') ? 'Group 1.10 (2.25Cr-1Mo)' : 'Group 1.15 (9Cr-1Mo-V)');
+                cwp = {150:19.8, 300:51.7, 600:103.4, 800:137.9, 900:155.1, 1500:258.6, 2500:430.9}[pClass] || 51.7;
+                maxTemp = 593;
+            } else if (material.includes('CF8M') || material.includes('F316')) {
+                group = 'Group 2.2 (316 Austenitic SS)';
+                cwp = {150:19.0, 300:49.6, 600:99.3, 800:132.4, 900:148.9, 1500:248.2, 2500:413.7}[pClass] || 49.6;
+                maxTemp = 538;
+            } else if (material.includes('A890')) {
+                group = 'Group 2.8 (Duplex / Super Duplex)';
+                cwp = {150:20.0, 300:51.7, 600:103.4, 800:137.9, 900:155.1, 1500:258.6, 2500:430.9}[pClass] || 51.7;
+                maxTemp = 315; // Duplex 475°C embrittlement limit per ASME
+            } else if (material.includes('Inconel625')) {
+                group = 'Group 3.8 (Nickel Alloy 625)';
+                cwp = {150:20.0, 300:51.7, 600:103.4, 800:137.9, 900:155.1, 1500:258.6, 2500:430.9}[pClass] || 51.7;
+                maxTemp = 649;
+            }
+
+            // Piecewise ASME B16.34 derating curve
+            let mawp = cwp;
+            if (tempC > 38) {
+                if (group.startsWith('Group 1.1')) {
+                    if (pClass === 150) {
+                        mawp = Math.max(4.5, 19.6 - (tempC - 38) * 0.0355);
+                    } else {
+                        if (tempC <= 200) mawp = cwp * (1 - (tempC - 38) * 0.00088);
+                        else if (tempC <= 350) mawp = cwp * (0.857 - (tempC - 200) * 0.00082);
+                        else mawp = cwp * (0.734 - (tempC - 350) * 0.0018);
+                    }
+                } else if (group.startsWith('Group 2.2')) {
+                    if (pClass === 150) {
+                        mawp = Math.max(4.5, 19.0 - (tempC - 38) * 0.032);
+                    } else {
+                        if (tempC <= 200) mawp = cwp * (1 - (tempC - 38) * 0.00145);
+                        else mawp = cwp * (0.765 - (tempC - 200) * 0.00062);
+                    }
+                } else if (group.startsWith('Group 2.8')) {
+                    mawp = cwp * (1 - (tempC - 38) * 0.00095);
+                } else {
+                    mawp = cwp * (1 - (tempC - 38) * 0.00065);
+                }
+            }
+            return { group, cwp, mawp: Math.max(1.0, mawp), maxTemp };
+        }
+
+        const BASE_STEEL_PRICE_PER_KG = {
+            'A216-WCB': 4.8, 'A105': 5.4, 'A352-LCC': 6.6, 'A350-LF2': 7.1,
+            'A217-WC6': 8.2, 'A217-WC9': 9.0, 'A217-C12A': 12.5,
+            'A351-CF8M': 14.0, 'A182-F316': 15.5,
+            'A890-4A': 21.0, 'A890-5A': 26.5, 'Inconel625': 72.0
+        };
+
+        const CLASS_MULT = { '150': 1.0, '300': 1.48, '600': 2.25, '800': 2.55, '900': 3.55, '1500': 5.40, '2500': 8.90 };
+        const OPERATOR_BASE_COST = { 'Lever': 28, 'Handwheel': 55, 'Gear': 185, 'Pneumatic-SR': 720, 'Pneumatic-DA': 560, 'Electric-MOV': 1650, 'BareStem': 0 };
+
+        window.onload = function() {
+            renderQuickTypeBar();
+            onValveTypeChange();
+            init3DScene();
+            recalculateAll();
+            calculateHydraulicSizing();
+            window.addEventListener('resize', onWindowResize, false);
+        };
+
+        function renderQuickTypeBar() {
+            const bar = document.getElementById('quickValveTypeBar');
+            bar.innerHTML = Object.keys(VALVE_CATALOG).map(k => `
+                <button onclick="selectQuickValve('${k}')" id="qbtn-${k}" class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${k === 'Gate' ? 'bg-brand-600 text-white border-brand-400 shadow' : 'bg-slate-900/80 text-slate-300 border-slate-700 hover:border-slate-500'}">
+                    ${VALVE_CATALOG[k].label}
+                </button>
+            `).join('');
+        }
+
+        function selectQuickValve(k) {
+            document.getElementById('valveType').value = k;
+            onValveTypeChange();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'viewerTab') {
+                setTimeout(() => { onWindowResize(); renderBlueprintSVG(); }, 80);
+            } else if (tabId === 'sizingTab') {
+                setTimeout(() => calculateHydraulicSizing(), 80);
+            } else if (tabId === 'costTab') {
+                setTimeout(() => recalculateAll(), 80);
+            }
+        }
+
+        function onValveTypeChange() {
+            const vType = document.getElementById('valveType').value;
+            Object.keys(VALVE_CATALOG).forEach(k => {
+                const btn = document.getElementById('qbtn-' + k);
+                if (btn) {
+                    btn.className = k === vType 
+                        ? 'px-3 py-1.5 rounded-lg text-xs font-semibold border transition bg-brand-600 text-white border-brand-400 shadow'
+                        : 'px-3 py-1.5 rounded-lg text-xs font-semibold border transition bg-slate-900/80 text-slate-300 border-slate-700 hover:border-slate-500';
+                }
+            });
+
+            const catInfo = VALVE_CATALOG[vType];
+            document.getElementById('applicableStdBadge').innerText = catInfo ? catInfo.std : 'ASME B16.34';
+            document.getElementById('approvedVendorsBadge').innerText = catInfo ? 'AVL: ' + catInfo.vendors : '';
+
+            const subTypeSelect = document.getElementById('valveSubType');
+            subTypeSelect.innerHTML = '';
+            if (catInfo && catInfo.subtypes) {
+                catInfo.subtypes.forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub;
+                    opt.innerText = sub;
+                    subTypeSelect.appendChild(opt);
+                });
+            }
+
+            const endConn = document.getElementById('endConnection');
+            const opType = document.getElementById('operatorType');
+            const seatMat = document.getElementById('seatMaterial');
+            if (vType === 'Butterfly') {
+                endConn.value = 'Wafer';
+                opType.value = 'Gear';
+                seatMat.value = 'MetalStellite';
+            } else if (vType === 'Ball' || vType === 'Plug') {
+                endConn.value = 'RF';
+                opType.value = 'Lever';
+                seatMat.value = 'RPTFE';
+            } else if (vType === 'Gate' || vType === 'Globe') {
+                endConn.value = 'RF';
+                opType.value = 'Handwheel';
+                seatMat.value = 'MetalStellite';
+            } else if (vType === 'Check' || vType === 'PSV') {
+                endConn.value = 'RF';
+                opType.value = 'BareStem';
+                seatMat.value = 'MetalStellite';
+            } else if (vType === 'Needle') {
+                endConn.value = 'NPT';
+                opType.value = 'Handwheel';
+                seatMat.value = 'MetalStellite';
+            }
+
+            recalculateAll();
+        }
+
+        /* ========================================================================= */
+        /* 6. CORE ENGINEERING & METALLURGICAL AUDIT ENGINE                          */
+        /* ========================================================================= */
+        function calculateCurrentValveSpecs() {
+            const type = document.getElementById('valveType').value;
+            const subType = document.getElementById('valveSubType').value;
+            const size = parseFloat(document.getElementById('valveSize').value);
+            const pClass = parseInt(document.getElementById('pressureClass').value);
+            const material = document.getElementById('bodyMaterial').value;
+            const trim = parseInt(document.getElementById('trimNo').value);
+            const operator = document.getElementById('operatorType').value;
+            const seatMat = document.getElementById('seatMaterial').value;
+            const bonnet = document.getElementById('bonnetType').value;
+            const endConn = document.getElementById('endConnection').value;
+            const temp = parseFloat(document.getElementById('designTemp').value) || 38;
+            const opPress = parseFloat(document.getElementById('operatingPressure').value) || 10;
+            const qty = Math.max(1, parseInt(document.getElementById('inputQty').value) || 1);
+            const fluid = document.getElementById('fluidService').value;
+
+            const ratingObj = getAsmeB1634Rating(material, pClass, temp);
+            const hydroTest = ratingObj.cwp * 1.5;
+            const seatTest = ratingObj.cwp * 1.1;
+
+            // Real Metallurgical & Engineering Checks
+            const alerts = [];
+            if (opPress > ratingObj.mawp) {
+                alerts.push(`خطای فشار (ASME B16.34): فشار کاری (${opPress} Bar) از حداکثر فشار مجاز گروه ${ratingObj.group} در دمای ${temp}°C (${ratingObj.mawp.toFixed(1)} Bar) بالاتر است.`);
+            }
+            if (temp > ratingObj.maxTemp) {
+                alerts.push(`خطای متالورژی دما: دمای طراحی (${temp}°C) از سقف مجاز متریال ${material} (${ratingObj.maxTemp}°C) فراتر رفته است (خطر خزش / تردی فاز سیگما در داپلکس).`);
+            }
+            if (temp < -29 && (material === 'A216-WCB' || material === 'A105' || material.includes('WC'))) {
+                alerts.push(`هشدار ضربه دمای پایین (Charpy V-Notch): فولاد کربنی/کرم‌مولیبدن زیر -29°C دچار شکست ترد می‌شود. از A352 LCC، A350 LF2 یا CF8M استفاده کنید.`);
+            }
+            if (temp < -46 && (material === 'A352-LCC' || material === 'A350-LF2')) {
+                alerts.push(`هشدار کرایوژنیک: زیر -46°C باید از استنلس استیل آستنیتی (A351 CF8M / A182 F316) به همراه Extended Bonnet (BS 6364) استفاده شود.`);
+            }
+            if (temp > 200 && (seatMat === 'RPTFE' || seatMat === 'Devlon' || seatMat === 'Viton')) {
+                alerts.push(`خطای متریال نشیمنگاه: سیت پلیمری ${seatMat} در دمای ${temp}°C تخریب می‌شود. از PEEK (تا 260°C) یا Metal-to-Metal Stellite 6 استفاده کنید.`);
+            }
+            if (fluid.includes('Sour') && !document.getElementById('chkNace').checked) {
+                alerts.push(`الزام استاندارد NACE MR0175 / ISO 15156: برای سرویس گاز ترش (H2S)، تیک NACE و کنترل سختی حداکثر 22 HRC (237 HB) الزامی است.`);
+            }
+            if (fluid.includes('Sea Water') && (material === 'A216-WCB' || material === 'A351-CF8M')) {
+                alerts.push(`هشدار خوردگی حفره‌ای (Chloride Pitting): برای آب دریا، فولاد کربنی یا SS316 دچار Pitting می‌شود. استفاده از Super Duplex (A890-5A, PREN>40) یا Monel/Inconel پیشنهاد می‌گردد.`);
+            }
+            if (size < 2 && (material.startsWith('A216') || material.startsWith('A351') || material.startsWith('A217'))) {
+                alerts.push(`توصیه استاندارد ساخت (API 602): برای سایزهای زیر 2 اینچ، بدنه فورج (Forged: A105, F316, LF2) جایگزین ریخته‌گری می‌شود.`);
+            }
+
+            // Real ASME B16.10 Face-to-Face Lookup
+            let f2f = 250;
+            const tableCat = (type === 'Check' || type === 'Plug') ? 'Gate' : (type === 'PSV' ? 'Globe' : type);
+            if (ASME_B16_10_F2F[tableCat] && ASME_B16_10_F2F[tableCat][size]) {
+                f2f = ASME_B16_10_F2F[tableCat][size][pClass] || ASME_B16_10_F2F[tableCat][size][300];
+            } else if (type === 'Needle') {
+                f2f = Math.round(65 + size * 35);
+            }
+            if (type === 'Check' && subType.includes('Dual Plate')) {
+                f2f = ASME_B16_10_F2F.Butterfly[size]?.[pClass] || Math.round(size * 14 + 35);
+            }
+
+            // Real ASME B16.5 Flange OD & Bolts
+            const flgInfo = ASME_B16_5_FLANGES[size]?.[pClass === 800 ? 600 : (pClass === 2500 ? 1500 : pClass)] || { od: Math.round(size * 25.4 * 1.8 + 110), bolts: '8x3/4"' };
+            const flangeOD = flgInfo.od;
+            const flangeBolts = endConn === 'BW' ? 'Butt-Weld Ends' : (endConn === 'SW' || endConn === 'NPT' ? endConn + ' Ends' : `${flgInfo.od} mm (${flgInfo.bolts})`);
+
+            // Realistic Weight (kg)
+            let baseWeight = Math.pow(size, 2.02) * 3.1 * (CLASS_MULT[pClass] || 1.0);
+            if (type === 'Globe') baseWeight *= 1.25;
+            if (type === 'Butterfly') baseWeight *= 0.36;
+            if (type === 'Check') baseWeight *= 0.65;
+            if (type === 'Needle') baseWeight = 1.4 + size * 2.1 * (pClass / 300);
+            if (type === 'PSV') baseWeight *= 1.32;
+            if (bonnet === 'PSB' || bonnet === 'Cryo') baseWeight *= 1.18;
+            const unitWeight = Math.max(1.4, baseWeight);
+
+            const height = Math.round(size * 25.4 * 3.2 + 125 + (bonnet === 'Cryo' ? 220 : 0));
+            const torque = Math.round(Math.pow(size, 2.15) * (pClass / 150) * 7.2 + 18);
+
+            let fullCv = 22 * Math.pow(size, 2);
+            if (type === 'Ball') fullCv = 34 * Math.pow(size, 2);
+            if (type === 'Gate') fullCv = 36 * Math.pow(size, 2);
+            if (type === 'Globe') fullCv = 11.5 * Math.pow(size, 2);
+            if (type === 'Butterfly') fullCv = 26 * Math.pow(size, 2);
+            const fullKv = fullCv * 0.865;
+
+            // Cost Modeling
+            const steelPrice = BASE_STEEL_PRICE_PER_KG[material] || 5.2;
+            let rawMaterialCost = unitWeight * steelPrice;
+            let trimAdd = 40 + (trim * 16);
+            if ([5, 8, 12, 16, 19].includes(trim)) trimAdd += 110 * (size / 2);
+            if (seatMat.includes('Metal')) trimAdd += 155 * (size / 2);
+            rawMaterialCost += trimAdd;
+
+            const actuatorCost = (OPERATOR_BASE_COST[operator] || 0) * (1 + size * 0.09);
+            rawMaterialCost += actuatorCost;
+
+            if (document.getElementById('chkInconelOverlay').checked) rawMaterialCost += unitWeight * 10.5;
+            if (document.getElementById('chkFugitive').checked) rawMaterialCost += 120;
+            if (document.getElementById('chkNace').checked) rawMaterialCost += 85;
+            if (document.getElementById('chkRT').checked) rawMaterialCost += 160;
+            if (document.getElementById('chkCryoTest').checked) rawMaterialCost += 280;
+
+            const machiningPct = parseFloat(document.getElementById('sliderMachining').value) / 100.0;
+            const profitPct = parseFloat(document.getElementById('sliderProfit').value) / 100.0;
+            const freightPct = parseFloat(document.getElementById('sliderFreight').value) / 100.0;
+            const vatPct = parseFloat(document.getElementById('sliderVat').value) / 100.0;
+
+            const machiningCost = rawMaterialCost * machiningPct;
+            const exWorksBase = rawMaterialCost + machiningCost;
+            const profitCost = exWorksBase * profitPct;
+            const fobCost = exWorksBase + profitCost;
+            const freightCost = fobCost * freightPct;
+            const cifCost = fobCost + freightCost;
+            const vatCost = cifCost * vatPct;
+            const unitPriceUSD = cifCost + vatCost;
+
+            return {
+                tag: document.getElementById('valveTag').value,
+                line: document.getElementById('lineNumber').value,
+                fluid, type, subType, size, pClass, material, trim, operator, seatMat, bonnet, endConn,
+                temp, opPress, qty,
+                matGroup: ratingObj.group,
+                mawp: ratingObj.mawp, hydroTest, seatTest, alerts,
+                weight: unitWeight, f2f, height, flangeOD, flangeBolts, torque,
+                fullCv, fullKv,
+                unitPriceUSD,
+                batchPriceUSD: unitPriceUSD * qty,
+                actuatorCost,
+                costBreakdown: {
+                    rawMaterial: rawMaterialCost - actuatorCost,
+                    actuator: actuatorCost,
+                    machining: machiningCost,
+                    profit: profitCost,
+                    freight: freightCost,
+                    vat: vatCost
+                }
+            };
+        }
+
+        function recalculateAll() {
+            const specs = calculateCurrentValveSpecs();
+
+            const alertBox = document.getElementById('engineeringAlertBox');
+            const ratingBadge = document.getElementById('ratingStatusBadge');
+            if (specs.alerts.length > 0) {
+                alertBox.className = 'rounded-lg p-3 text-xs border border-amber-500/50 bg-amber-950/40 text-amber-200 flex flex-col gap-1.5';
+                alertBox.innerHTML = specs.alerts.map(a => `<div><i class="fa-solid fa-triangle-exclamation text-amber-400 ml-1.5"></i>${a}</div>`).join('');
+                alertBox.classList.remove('hidden');
+                ratingBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono';
+                ratingBadge.innerText = 'METALLURGY / CODE ALERT';
+            } else {
+                alertBox.classList.add('hidden');
+                ratingBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono';
+                ratingBadge.innerText = 'ASME B16.34 / API OK';
+            }
+
+            document.getElementById('telemetryMatGroup').innerText = specs.matGroup;
+            document.getElementById('telemetryMAWP').innerText = specs.mawp.toFixed(1) + ' Bar';
+            document.getElementById('telemetryHydroTest').innerText = specs.hydroTest.toFixed(1) + ' Bar';
+            document.getElementById('telemetrySeatTest').innerText = specs.seatTest.toFixed(1) + ' Bar';
+            document.getElementById('telemetryCv').innerText = `${Math.round(specs.fullCv).toLocaleString()} / ${Math.round(specs.fullKv).toLocaleString()}`;
+
+            document.getElementById('telemetryWeight').innerText = `${specs.weight.toFixed(1)} / ${(specs.weight * specs.qty).toFixed(1)} kg`;
+            document.getElementById('telemetryF2F').innerText = specs.f2f + ' mm';
+            document.getElementById('telemetryHeight').innerText = specs.height + ' mm';
+            document.getElementById('telemetryFlangeOD').innerText = specs.flangeBolts;
+            document.getElementById('telemetryTorque').innerText = specs.torque + ' N.m';
+
+            const activeCurr = document.getElementById('activeCurrency').value;
+            const fxUsdIrt = parseFloat(document.getElementById('fxUsdIrt').value) || 68000;
+            const fxEurUsd = parseFloat(document.getElementById('fxEurUsd').value) || 1.08;
+            const secondaryCurr = activeCurr === 'IRT' ? 'USD' : 'IRT';
+
+            document.getElementById('lblBatchQty').innerText = specs.qty;
+            document.getElementById('unitPriceDisplay').innerText = formatCurrency(specs.unitPriceUSD, activeCurr, fxUsdIrt, fxEurUsd);
+            document.getElementById('unitPriceConvertedDisplay').innerText = formatCurrency(specs.unitPriceUSD, secondaryCurr, fxUsdIrt, fxEurUsd);
+
+            document.getElementById('batchPriceDisplay').innerText = formatCurrency(specs.batchPriceUSD, activeCurr, fxUsdIrt, fxEurUsd);
+            document.getElementById('batchPriceConvertedDisplay').innerText = formatCurrency(specs.batchPriceUSD, secondaryCurr, fxUsdIrt, fxEurUsd);
+
+            document.getElementById('cadOverlayBadge').innerText = `${specs.tag} | ${specs.type} ${specs.size}" CL${specs.pClass} | ${specs.material}`;
+            document.getElementById('bomTrimBadge').innerText = `API Trim ${specs.trim}`;
+
+            renderCBSList(specs.costBreakdown, specs.unitPriceUSD);
+            buildDetailed3DValve(specs.type, isExploded, isCutaway, specs);
+            renderBlueprintSVG();
+            renderMTOTable();
+        }
+
+        /* ========================================================================= */
+        /* 7. REALISTIC SHOP-DRAWING 3D CAD GENERATOR (THREE.JS)                     */
+        /* ========================================================================= */
+        function init3DScene() {
+            const container = document.getElementById('threeContainer');
+            if (!container) return;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x040812);
+
+            camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1200);
+            camera.position.set(130, 95, 160);
+
+            try {
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                container.appendChild(renderer.domElement);
+            } catch (e) { return; }
+
+            if (typeof THREE.OrbitControls !== 'undefined') {
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.06;
+                controls.minDistance = 35;
+                controls.maxDistance = 420;
+            }
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight1 = new THREE.DirectionalLight(0x7dd3fc, 1.35);
+            dirLight1.position.set(130, 180, 120);
+            scene.add(dirLight1);
+
+            const dirLight2 = new THREE.DirectionalLight(0xfbbf24, 0.75);
+            dirLight2.position.set(-120, -50, -110);
+            scene.add(dirLight2);
+
+            const gridHelper = new THREE.GridHelper(300, 30, 0x0284c7, 0x1e293b);
+            gridHelper.position.y = -55;
+            scene.add(gridHelper);
+
+            currentMeshGroup = new THREE.Group();
+            scene.add(currentMeshGroup);
+
+            animateLoop();
+        }
+
+        function animateLoop() {
+            if (!renderer) return;
+            requestAnimationFrame(animateLoop);
+            if (isAutoRotate && currentMeshGroup) currentMeshGroup.rotation.y += 0.004;
+            if (controls) controls.update();
+            if (scene && camera) renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('threeContainer');
+            if (!container || !renderer || !camera) return;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function toggleAutoRotate() {
+            isAutoRotate = !isAutoRotate;
+            document.getElementById('btnAutoRotate').classList.toggle('bg-cyan-600/40', isAutoRotate);
+        }
+        function toggleWireframe() {
+            isWireframe = !isWireframe;
+            document.getElementById('btnWireframe').classList.toggle('bg-brand-600/40', isWireframe);
+            recalculateAll();
+        }
+        function toggleCutawayView() {
+            isCutaway = !isCutaway;
+            document.getElementById('btnCutaway').classList.toggle('bg-sky-500/50', isCutaway);
+            updateViewModeBadge();
+            recalculateAll();
+        }
+        function toggleExplodedView() {
+            isExploded = !isExploded;
+            document.getElementById('btnExplode').classList.toggle('bg-amber-500/60', isExploded);
+            updateViewModeBadge();
+            recalculateAll();
+        }
+        function enableExplodedView() {
+            isExploded = true;
+            document.getElementById('btnExplode').classList.add('bg-amber-500/60');
+            updateViewModeBadge();
+            recalculateAll();
+        }
+        function updateViewModeBadge() {
+            const b = document.getElementById('cadViewModeBadge');
+            if (!b) return;
+            if (isCutaway && isExploded) b.innerText = 'Mode: Half-Section Cutaway + Exploded';
+            else if (isCutaway) b.innerText = 'Mode: Half-Section Cutaway (برش مقطعی)';
+            else if (isExploded) b.innerText = 'Mode: Exploded Assembly (انفجاری)';
+            else b.innerText = 'Mode: Assembled Solid';
+        }
+
+        // Helper: Build Realistic ASME B16.5 Flange with Raised Face & Bolt Holes
+        function createAsmeFlange(outerR, boreR, thickness, numBolts, mat, cutaway) {
+            const group = new THREE.Group();
+            const shape = new THREE.Shape();
+            const startAng = 0;
+            const endAng = cutaway ? Math.PI : Math.PI * 2;
+            shape.absarc(0, 0, outerR, startAng, endAng, false);
+            if (cutaway) {
+                shape.lineTo(boreR * Math.cos(endAng), boreR * Math.sin(endAng));
+                shape.absarc(0, 0, boreR, endAng, startAng, true);
+                shape.closePath();
+            } else {
+                const holePath = new THREE.Path();
+                holePath.absarc(0, 0, boreR, 0, Math.PI * 2, true);
+                shape.holes.push(holePath);
+                const boltCircleR = (outerR + boreR) * 0.54;
+                const boltR = Math.max(1.5, (outerR - boreR) * 0.14);
+                for (let i = 0; i < numBolts; i++) {
+                    const ang = (i / numBolts) * Math.PI * 2;
+                    const bh = new THREE.Path();
+                    bh.absarc(Math.cos(ang) * boltCircleR, Math.sin(ang) * boltCircleR, boltR, 0, Math.PI * 2, true);
+                    shape.holes.push(bh);
+                }
+            }
+            const geom = new THREE.ExtrudeGeometry(shape, { depth: thickness, bevelEnabled: true, bevelThickness: 0.6, bevelSize: 0.6, bevelSegments: 2, curveSegments: 32 });
+            geom.center();
+            const mesh = new THREE.Mesh(geom, mat);
+            mesh.rotation.y = Math.PI / 2;
+            group.add(mesh);
+
+            // Raised Face (RF) step
+            const rfGeom = new THREE.CylinderGeometry(boreR + (outerR - boreR) * 0.32, boreR + (outerR - boreR) * 0.32, 1.5, 32, 1, false, 0, cutaway ? Math.PI : Math.PI * 2);
+            rfGeom.rotateZ(Math.PI / 2);
+            const rfMesh = new THREE.Mesh(rfGeom, mat);
+            rfMesh.position.x = thickness * 0.5 + 0.7;
+            group.add(rfMesh);
+            return group;
+        }
+
+        // Helper: Build Hollow Cylindrical Pipe / Body Barrel with Cutaway support
+        function createHollowBarrel(outerR, innerR, length, mat, cutaway) {
+            const shape = new THREE.Shape();
+            const endAng = cutaway ? Math.PI : Math.PI * 2;
+            shape.absarc(0, 0, outerR, 0, endAng, false);
+            if (cutaway) {
+                shape.lineTo(innerR * Math.cos(endAng), innerR * Math.sin(endAng));
+                shape.absarc(0, 0, innerR, endAng, 0, true);
+                shape.closePath();
+            } else {
+                const hole = new THREE.Path();
+                hole.absarc(0, 0, innerR, 0, Math.PI * 2, true);
+                shape.holes.push(hole);
+            }
+            const geom = new THREE.ExtrudeGeometry(shape, { depth: length, bevelEnabled: false, curveSegments: 32 });
+            geom.center();
+            const mesh = new THREE.Mesh(geom, mat);
+            mesh.rotation.y = Math.PI / 2;
+            return mesh;
+        }
+
+        // Helper: Build Operator (Handwheel / Gearbox / Pneumatic Actuator / Lever)
+        function createOperatorAssembly(opType, opMat, stemMat, boltMat) {
+            const g = new THREE.Group();
+            if (opType === 'Handwheel') {
+                const rim = new THREE.Mesh(new THREE.TorusGeometry(26, 2.4, 14, 32), opMat);
+                rim.rotation.x = Math.PI / 2;
+                g.add(rim);
+                for (let i = 0; i < 4; i++) {
+                    const spoke = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 52, 10), opMat);
+                    spoke.rotation.z = Math.PI / 2;
+                    spoke.rotation.y = (i * Math.PI) / 4;
+                    g.add(spoke);
+                }
+                const hub = new THREE.Mesh(new THREE.CylinderGeometry(5.5, 5.5, 9, 16), boltMat);
+                g.add(hub);
+            } else if (opType === 'Gear') {
+                const housing = new THREE.Mesh(new THREE.CylinderGeometry(14, 14, 16, 24), opMat);
+                g.add(housing);
+                const wormBox = new THREE.Mesh(new THREE.BoxGeometry(22, 10, 10), opMat);
+                wormBox.position.set(14, 0, 0);
+                g.add(wormBox);
+                const wheel = new THREE.Mesh(new THREE.TorusGeometry(20, 2, 12, 28), boltMat);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(27, 0, 0);
+                g.add(wheel);
+            } else if (opType === 'Pneumatic-SR' || opType === 'Pneumatic-DA') {
+                const yokeCenter = new THREE.Mesh(new THREE.BoxGeometry(20, 18, 18), opMat);
+                g.add(yokeCenter);
+                const cyl = new THREE.Mesh(new THREE.CylinderGeometry(13, 13, 34, 24), opMat);
+                cyl.rotation.z = Math.PI / 2;
+                cyl.position.set(-25, 0, 0);
+                g.add(cyl);
+                if (opType === 'Pneumatic-SR') {
+                    const springCan = new THREE.Mesh(new THREE.CylinderGeometry(14, 14, 36, 24), boltMat);
+                    springCan.rotation.z = Math.PI / 2;
+                    springCan.position.set(26, 0, 0);
+                    g.add(springCan);
+                }
+            } else if (opType === 'Electric-MOV') {
+                const mainGear = new THREE.Mesh(new THREE.CylinderGeometry(15, 15, 22, 24), opMat);
+                g.add(mainGear);
+                const motor = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 32, 20), boltMat);
+                motor.rotation.z = Math.PI / 2;
+                motor.position.set(-22, 4, 0);
+                g.add(motor);
+                const localCtrl = new THREE.Mesh(new THREE.BoxGeometry(14, 16, 14), stemMat);
+                localCtrl.position.set(15, 4, 0);
+                g.add(localCtrl);
+            } else if (opType === 'Lever') {
+                const hub = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 10, 16), boltMat);
+                g.add(hub);
+                const arm = new THREE.Mesh(new THREE.BoxGeometry(72, 3.5, 7), opMat);
+                arm.position.set(34, 2, 0);
+                g.add(arm);
+            }
+            return g;
+        }
+
+        function buildDetailed3DValve(valveType, exploded, cutaway, specs) {
+            if (!currentMeshGroup) return;
+
+            while (currentMeshGroup.children.length > 0) {
+                const child = currentMeshGroup.children[0];
+                currentMeshGroup.remove(child);
+            }
+
+            const exp = exploded ? 1.0 : 0.0;
+            const trimInfo = API_TRIM_MATRIX[specs.trim] || API_TRIM_MATRIX[8];
+            const partsList = [];
+
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.78, roughness: 0.28, wireframe: isWireframe, side: THREE.DoubleSide });
+            const bonnetMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.75, roughness: 0.3, wireframe: isWireframe, side: THREE.DoubleSide });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.9, roughness: 0.14, wireframe: isWireframe, side: THREE.DoubleSide });
+            const seatMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, metalness: 0.65, roughness: 0.25, wireframe: isWireframe, side: THREE.DoubleSide });
+            const stemMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.92, roughness: 0.15, wireframe: isWireframe });
+            const boltMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2, wireframe: isWireframe });
+            const opMat = new THREE.MeshStandardMaterial({ color: 0x059669, metalness: 0.55, roughness: 0.38, wireframe: isWireframe });
+
+            const numBolts = specs.size >= 6 ? 12 : 8;
+
+            if (valveType === 'Gate') {
+                // 1. Flow Barrel & Center Wedge Cavity
+                const barrel = createHollowBarrel(22, 16, 62, bodyMat, cutaway);
+                currentMeshGroup.add(barrel);
+                const cavity = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 38, 28, 1, false, 0, cutaway ? Math.PI : Math.PI * 2), bodyMat);
+                cavity.position.y = 8;
+                currentMeshGroup.add(cavity);
+                partsList.push({ id: 1, name: 'بدنه یکپارچه ریخته‌گری/فورج (Valve Body)', mat: specs.material, std: 'ASME B16.34 / API 600', color: 'border-slate-400 text-slate-200' });
+
+                // End Flanges (ASME B16.5)
+                if (specs.endConn === 'RF' || specs.endConn === 'RTJ') {
+                    const flgL = createAsmeFlange(38, 16, 8, numBolts, bodyMat, cutaway);
+                    flgL.position.x = -31 - exp * 12;
+                    currentMeshGroup.add(flgL);
+                    const flgR = createAsmeFlange(38, 16, 8, numBolts, bodyMat, cutaway);
+                    flgR.position.x = 31 + exp * 12;
+                    flgR.rotation.y = Math.PI;
+                    currentMeshGroup.add(flgR);
+                }
+
+                // 2. Seat Rings (2x Stellite Hardfaced)
+                const seatL = new THREE.Mesh(new THREE.TorusGeometry(16, 2.2, 14, 32), seatMat);
+                seatL.rotation.y = Math.PI / 2;
+                seatL.position.x = -8 - exp * 14;
+                currentMeshGroup.add(seatL);
+                const seatR = seatL.clone();
+                seatR.position.x = 8 + exp * 14;
+                currentMeshGroup.add(seatR);
+                partsList.push({ id: 2, name: 'رینگ‌های نشیمنگاه جوش/رزوه‌ای (2x Seat Rings)', mat: trimInfo.seat, std: 'Hardfaced CoCr-A', color: 'border-rose-500 text-rose-300' });
+
+                // 3. Flexible Wedge (گوه انعطاف‌پذیر)
+                const wedge = new THREE.Mesh(new THREE.CylinderGeometry(16.5, 15.5, 7, 28), trimMat);
+                wedge.rotation.z = Math.PI / 2;
+                wedge.position.set(0, 2 + exp * 18, exp * 26);
+                currentMeshGroup.add(wedge);
+                partsList.push({ id: 3, name: 'گوه انعطاف‌پذیر (Flexible Wedge Disc)', mat: trimInfo.disc, std: 'API 600 Sec. 5.6', color: 'border-cyan-400 text-cyan-300' });
+
+                // 4. Bonnet & Spiral Wound Gasket + Bonnet Stud Bolts
+                const bonnetFlange = new THREE.Mesh(new THREE.CylinderGeometry(28, 28, 6, 28, 1, false, 0, cutaway ? Math.PI : Math.PI * 2), bonnetMat);
+                bonnetFlange.position.y = 28 + exp * 24;
+                currentMeshGroup.add(bonnetFlange);
+                const bonnetNeck = new THREE.Mesh(new THREE.CylinderGeometry(12, 18, 24, 24, 1, false, 0, cutaway ? Math.PI : Math.PI * 2), bonnetMat);
+                bonnetNeck.position.y = 42 + exp * 26;
+                currentMeshGroup.add(bonnetNeck);
+                // Yoke Arms
+                const yokeL = new THREE.Mesh(new THREE.BoxGeometry(4, 28, 5), bonnetMat);
+                yokeL.position.set(-10, 66 + exp * 28, 0);
+                currentMeshGroup.add(yokeL);
+                const yokeR = yokeL.clone();
+                yokeR.position.x = 10;
+                currentMeshGroup.add(yokeR);
+                const yokeTop = new THREE.Mesh(new THREE.BoxGeometry(26, 6, 12), bonnetMat);
+                yokeTop.position.set(0, 81 + exp * 30, 0);
+                currentMeshGroup.add(yokeTop);
+                partsList.push({ id: 4, name: `بونت و یوک یکپارچه (${specs.bonnet} + Yoke)`, mat: specs.material, std: 'ASTM A193 B7/2H Studs', color: 'border-sky-500 text-sky-300' });
+
+                // 5. Gland Packing & Gland Follower Flange
+                const gland = new THREE.Mesh(new THREE.CylinderGeometry(7.5, 7.5, 9, 18), boltMat);
+                gland.position.y = 56 + exp * 38;
+                currentMeshGroup.add(gland);
+                partsList.push({ id: 5, name: 'پکینگ گرافیتی و گلند فالوئر (Packing & Gland)', mat: 'Braided + Die-Formed Graphite', std: 'ISO 15848-1 / API 624', color: 'border-slate-300 text-slate-200' });
+
+                // 6. Rising Stem (OS&Y)
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 88, 16), stemMat);
+                stem.position.y = 52 + exp * 48;
+                currentMeshGroup.add(stem);
+                partsList.push({ id: 6, name: 'ساقه بالارونده رزوه ذوزنقه‌ای (OS&Y Rising Stem)', mat: trimInfo.stem, std: 'ACME Thread', color: 'border-amber-400 text-amber-300' });
+
+                // 7. Operator
+                if (specs.operator !== 'BareStem') {
+                    const op = createOperatorAssembly(specs.operator, opMat, stemMat, boltMat);
+                    op.position.y = 85 + exp * 65;
+                    currentMeshGroup.add(op);
+                    partsList.push({ id: 7, name: `عملگر (${specs.operator})`, mat: 'Ductile Iron / Carbon Steel', std: 'MSS SP-102', color: 'border-emerald-400 text-emerald-300' });
+                }
+
+            } else if (valveType === 'Globe') {
+                // Globe S-Body
+                const sphereBody = new THREE.Mesh(new THREE.SphereGeometry(28, 32, 24, 0, cutaway ? Math.PI : Math.PI * 2), bodyMat);
+                currentMeshGroup.add(sphereBody);
+                const barrel = createHollowBarrel(20, 15, 68, bodyMat, cutaway);
+                currentMeshGroup.add(barrel);
+                if (specs.endConn === 'RF' || specs.endConn === 'RTJ') {
+                    const flgL = createAsmeFlange(38, 15, 8, numBolts, bodyMat, cutaway);
+                    flgL.position.x = -34 - exp * 12;
+                    currentMeshGroup.add(flgL);
+                    const flgR = createAsmeFlange(38, 15, 8, numBolts, bodyMat, cutaway);
+                    flgR.position.x = 34 + exp * 12;
+                    flgR.rotation.y = Math.PI;
+                    currentMeshGroup.add(flgR);
+                }
+                partsList.push({ id: 1, name: 'بدنه کروی S-Pattern (Globe Body)', mat: specs.material, std: 'API 623 / BS 1873', color: 'border-slate-400 text-slate-200' });
+
+                // Horizontal Seat Ring
+                const seat = new THREE.Mesh(new THREE.TorusGeometry(13, 2.2, 14, 32), seatMat);
+                seat.rotation.x = Math.PI / 2;
+                seat.position.y = -2 + exp * 10;
+                currentMeshGroup.add(seat);
+                partsList.push({ id: 2, name: 'رینگ نشیمنگاه افقی (Guided Seat Ring)', mat: trimInfo.seat, std: 'Stellite 6 Faced', color: 'border-rose-500 text-rose-300' });
+
+                // Parabolic / Conical Plug Disc
+                const plug = new THREE.Mesh(new THREE.CylinderGeometry(11, 14, 12, 24), trimMat);
+                plug.position.y = 7 + exp * 22;
+                currentMeshGroup.add(plug);
+                partsList.push({ id: 3, name: 'پلاگ مخروطی / پارابولیک (Tapered Plug Disc)', mat: trimInfo.disc, std: 'Swivel Disc Design', color: 'border-cyan-400 text-cyan-300' });
+
+                // Bonnet & Yoke
+                const bonnet = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 28, 24, 1, false, 0, cutaway ? Math.PI : Math.PI * 2), bonnetMat);
+                bonnet.position.y = 32 + exp * 32;
+                currentMeshGroup.add(bonnet);
+                partsList.push({ id: 4, name: `بونت و یوک سنگین (${specs.bonnet})`, mat: specs.material, std: 'ASME B16.34', color: 'border-sky-500 text-sky-300' });
+
+                // Stem & Operator
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 76, 16), stemMat);
+                stem.position.y = 46 + exp * 46;
+                currentMeshGroup.add(stem);
+                partsList.push({ id: 5, name: 'ساقه رزوه‌دار ضد چرخش (Non-Rotating Stem)', mat: trimInfo.stem, std: 'API 623', color: 'border-amber-400 text-amber-300' });
+
+                if (specs.operator !== 'BareStem') {
+                    const op = createOperatorAssembly(specs.operator, opMat, stemMat, boltMat);
+                    op.position.y = 82 + exp * 62;
+                    currentMeshGroup.add(op);
+                    partsList.push({ id: 6, name: `عملگر (${specs.operator})`, mat: 'Ductile Iron / Steel', std: 'ISO 5211', color: 'border-emerald-400 text-emerald-300' });
+                }
+
+            } else if (valveType === 'Ball') {
+                const isTrunnion = specs.subType.includes('Trunnion') || specs.size >= 6;
+                // Center Body + End Closures (2-Piece or 3-Piece)
+                const centerBody = createHollowBarrel(28, 21, 32, bodyMat, cutaway);
+                currentMeshGroup.add(centerBody);
+                const endCapL = createHollowBarrel(26, 17, 18, bonnetMat, cutaway);
+                endCapL.position.x = -25 - exp * 18;
+                currentMeshGroup.add(endCapL);
+                const endCapR = createHollowBarrel(26, 17, 18, bonnetMat, cutaway);
+                endCapR.position.x = 25 + exp * 18;
+                currentMeshGroup.add(endCapR);
+
+                if (specs.endConn === 'RF' || specs.endConn === 'RTJ') {
+                    const flgL = createAsmeFlange(38, 17, 8, numBolts, bonnetMat, cutaway);
+                    flgL.position.x = -36 - exp * 22;
+                    currentMeshGroup.add(flgL);
+                    const flgR = createAsmeFlange(38, 17, 8, numBolts, bonnetMat, cutaway);
+                    flgR.position.x = 36 + exp * 22;
+                    flgR.rotation.y = Math.PI;
+                    currentMeshGroup.add(flgR);
+                }
+                partsList.push({ id: 1, name: isTrunnion ? 'بدنه سه تکه پیچ‌دار (3-Piece Bolted Body)' : 'بدنه دو تکه (2-Piece Split Body)', mat: specs.material, std: 'API 6D / ISO 17292', color: 'border-slate-400 text-slate-200' });
+
+                // Precision Ball with Bore
+                const ball = new THREE.Mesh(new THREE.SphereGeometry(20, 32, 32), trimMat);
+                ball.position.z = exp * 34;
+                currentMeshGroup.add(ball);
+                partsList.push({ id: 2, name: isTrunnion ? 'گوی ترونیون‌دار صیقلی (Trunnion Ball)' : 'گوی شناور تمام‌گذر (Floating Full-Bore Ball)', mat: trimInfo.disc, std: 'Ra ≤ 0.2 μm Mirror Finish', color: 'border-cyan-400 text-cyan-300' });
+
+                // Spring-Energized Seats (SPE / DPE)
+                const seatL = new THREE.Mesh(new THREE.TorusGeometry(17.5, 2.4, 14, 32), seatMat);
+                seatL.rotation.y = Math.PI / 2;
+                seatL.position.x = -14 - exp * 12;
+                currentMeshGroup.add(seatL);
+                const seatR = seatL.clone();
+                seatR.position.x = 14 + exp * 12;
+                currentMeshGroup.add(seatR);
+                partsList.push({ id: 3, name: 'سیت‌رینگ‌های فنردار دوگانه (SPE/DPE Seat Rings)', mat: specs.seatMat, std: 'API 6D PMSS / Soft Seat', color: 'border-rose-500 text-rose-300' });
+
+                if (isTrunnion) {
+                    const trunBottom = new THREE.Mesh(new THREE.CylinderGeometry(8, 10, 12, 18), bonnetMat);
+                    trunBottom.position.y = -28 - exp * 16;
+                    currentMeshGroup.add(trunBottom);
+                    partsList.push({ id: 4, name: 'یاتاقان ترونیون تحتانی و بلبرینگ (Trunnion Plate)', mat: 'ASTM A182 F316 + PTFE Bearing', std: 'API 6D', color: 'border-sky-500 text-sky-300' });
+                }
+
+                // Anti-Blowout Stem + ISO 5211 Pad
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 42, 16), stemMat);
+                stem.position.y = 32 + exp * 28;
+                currentMeshGroup.add(stem);
+                const isoPad = new THREE.Mesh(new THREE.CylinderGeometry(15, 15, 5, 20), bonnetMat);
+                isoPad.position.y = 29 + exp * 20;
+                currentMeshGroup.add(isoPad);
+                partsList.push({ id: 5, name: 'ساقه ضد پرتاب (Anti-Blowout Stem + ISO 5211)', mat: trimInfo.stem, std: 'API 607 Fire-Safe', color: 'border-amber-400 text-amber-300' });
+
+                if (specs.operator !== 'BareStem') {
+                    const op = createOperatorAssembly(specs.operator, opMat, stemMat, boltMat);
+                    op.position.y = 54 + exp * 44;
+                    currentMeshGroup.add(op);
+                    partsList.push({ id: 6, name: `عملگر (${specs.operator})`, mat: 'Ductile Iron / Steel', std: 'ISO 5211', color: 'border-emerald-400 text-emerald-300' });
+                }
+
+            } else if (valveType === 'Butterfly') {
+                const isLug = specs.endConn === 'Lug' || specs.subType.includes('Lug');
+                const body = createHollowBarrel(34, 28, 18, bodyMat, cutaway);
+                currentMeshGroup.add(body);
+                if (isLug) {
+                    for (let i = 0; i < 8; i++) {
+                        const ang = (i / 8) * Math.PI * 2;
+                        const lug = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 4.5, 16, 14), bodyMat);
+                        lug.rotation.z = Math.PI / 2;
+                        lug.position.set(0, Math.sin(ang) * 37, Math.cos(ang) * 37);
+                        currentMeshGroup.add(lug);
+                    }
+                }
+                partsList.push({ id: 1, name: isLug ? 'بدنه لاگ رزوه‌دار (Tapped Lug Body)' : 'بدنه ویفر / دابل فلنج (API 609 Body)', mat: specs.material, std: 'API 609 Cat. B', color: 'border-slate-400 text-slate-200' });
+
+                // Laminated Metal / Resilient Seat
+                const seat = new THREE.Mesh(new THREE.TorusGeometry(27.5, 2.2, 14, 36), seatMat);
+                seat.rotation.y = Math.PI / 2;
+                seat.position.x = exp * 20;
+                currentMeshGroup.add(seat);
+                partsList.push({ id: 2, name: 'نشیمنگاه لمینیت فلزی / پلیمری (Laminated Seat)', mat: specs.seatMat, std: 'Zero Leakage API 598', color: 'border-rose-500 text-rose-300' });
+
+                // Offset Disc
+                const disc = new THREE.Mesh(new THREE.CylinderGeometry(26.5, 25.5, 3.8, 36), trimMat);
+                disc.rotation.z = Math.PI / 2;
+                disc.rotation.y = 0.35;
+                disc.position.x = -exp * 22;
+                currentMeshGroup.add(disc);
+                partsList.push({ id: 3, name: 'دیسک مخروطی خارج از مرکز (Offset Disc)', mat: trimInfo.disc, std: 'Triple/Double Offset', color: 'border-cyan-400 text-cyan-300' });
+
+                // One-Piece Through Stem
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(3.8, 3.8, 88, 16), stemMat);
+                stem.position.y = 12 + exp * 26;
+                currentMeshGroup.add(stem);
+                partsList.push({ id: 4, name: 'شفت یکپارچه سنگین (Heavy-Duty Drive Shaft)', mat: trimInfo.stem, std: 'ASTM A564 17-4PH / F316', color: 'border-amber-400 text-amber-300' });
+
+                if (specs.operator !== 'BareStem') {
+                    const op = createOperatorAssembly(specs.operator, opMat, stemMat, boltMat);
+                    op.position.y = 56 + exp * 46;
+                    currentMeshGroup.add(op);
+                    partsList.push({ id: 5, name: `عملگر (${specs.operator})`, mat: 'Ductile Iron', std: 'ISO 5211', color: 'border-emerald-400 text-emerald-300' });
+                }
+
+            } else if (valveType === 'Check') {
+                const isDualPlate = specs.subType.includes('Dual Plate');
+                if (isDualPlate) {
+                    const body = createHollowBarrel(34, 27, 20, bodyMat, cutaway);
+                    currentMeshGroup.add(body);
+                    partsList.push({ id: 1, name: 'بدنه ویفر/لاگ دو صفحه‌ای (API 594 Body)', mat: specs.material, std: 'API 594', color: 'border-slate-400 text-slate-200' });
+
+                    const plate1 = new THREE.Mesh(new THREE.CylinderGeometry(25, 25, 2.5, 28, 1, false, 0, Math.PI), trimMat);
+                    plate1.rotation.z = Math.PI / 2;
+                    plate1.position.x = exp * 18;
+                    currentMeshGroup.add(plate1);
+                    const plate2 = plate1.clone();
+                    plate2.rotation.x = Math.PI;
+                    currentMeshGroup.add(plate2);
+                    partsList.push({ id: 2, name: 'دو لنگه نیم‌دایره (Dual Half-Moon Plates)', mat: trimInfo.disc, std: 'API 594', color: 'border-cyan-400 text-cyan-300' });
+
+                    const hingePin = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 58, 14), stemMat);
+                    hingePin.position.x = exp * 28;
+                    currentMeshGroup.add(hingePin);
+                    partsList.push({ id: 3, name: 'پین لولا، پین متوقف‌کننده و فنر پیچشی (Inconel X-750 Spring)', mat: 'Inconel X-750 / F316', std: 'Retainerless Design', color: 'border-amber-400 text-amber-300' });
+                } else {
+                    const barrel = createHollowBarrel(22, 16, 64, bodyMat, cutaway);
+                    currentMeshGroup.add(barrel);
+                    const cap = new THREE.Mesh(new THREE.CylinderGeometry(24, 24, 10, 24), bonnetMat);
+                    cap.position.y = 26 + exp * 26;
+                    currentMeshGroup.add(cap);
+                    if (specs.endConn === 'RF' || specs.endConn === 'RTJ') {
+                        const flgL = createAsmeFlange(38, 16, 8, numBolts, bodyMat, cutaway);
+                        flgL.position.x = -32 - exp * 12;
+                        currentMeshGroup.add(flgL);
+                        const flgR = createAsmeFlange(38, 16, 8, numBolts, bodyMat, cutaway);
+                        flgR.position.x = 32 + exp * 12;
+                        flgR.rotation.y = Math.PI;
+                        currentMeshGroup.add(flgR);
+                    }
+                    partsList.push({ id: 1, name: 'بدنه و درپوش پیچ‌دار (Bolted Cover Body)', mat: specs.material, std: 'BS 1868 / API 6D', color: 'border-slate-400 text-slate-200' });
+
+                    const clapper = new THREE.Mesh(new THREE.CylinderGeometry(16, 16, 4, 28), trimMat);
+                    clapper.rotation.z = Math.PI / 2 - 0.35;
+                    clapper.position.y = exp * 16;
+                    currentMeshGroup.add(clapper);
+                    partsList.push({ id: 2, name: 'دیسک لولایی و بازوی اهرمی (Swing Disc & Arm)', mat: trimInfo.disc, std: 'BS 1868', color: 'border-cyan-400 text-cyan-300' });
+
+                    const seat = new THREE.Mesh(new THREE.TorusGeometry(16, 2, 14, 32), seatMat);
+                    seat.rotation.y = Math.PI / 2;
+                    seat.rotation.z = -0.25;
+                    seat.position.x = -6 - exp * 12;
+                    currentMeshGroup.add(seat);
+                    partsList.push({ id: 3, name: 'رینگ نشیمنگاه زاویه‌دار (Inclined Seat Ring)', mat: trimInfo.seat, std: 'Stellite 6 Faced', color: 'border-rose-500 text-rose-300' });
+                }
+
+            } else if (valveType === 'PSV') {
+                // Angle 90° Body (Bottom Inlet, Side Outlet)
+                const inletNeck = new THREE.Mesh(new THREE.CylinderGeometry(16, 16, 36, 24), bodyMat);
+                inletNeck.position.y = -22 - exp * 12;
+                currentMeshGroup.add(inletNeck);
+                const inFlg = createAsmeFlange(32, 12, 8, 8, bodyMat, false);
+                inFlg.rotation.z = Math.PI / 2;
+                inFlg.position.y = -40 - exp * 18;
+                currentMeshGroup.add(inFlg);
+
+                const outletNeck = createHollowBarrel(19, 14, 38, bodyMat, cutaway);
+                outletNeck.position.x = 22 + exp * 12;
+                currentMeshGroup.add(outletNeck);
+                const outFlg = createAsmeFlange(36, 14, 8, 8, bodyMat, cutaway);
+                outFlg.position.x = 41 + exp * 18;
+                outFlg.rotation.y = Math.PI;
+                currentMeshGroup.add(outFlg);
+                partsList.push({ id: 1, name: 'بدنه زاویه‌دار ۹۰ درجه (API 526 Angle Body)', mat: specs.material, std: 'API 526 / ASME Sec. VIII', color: 'border-slate-400 text-slate-200' });
+
+                const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(11, 13, 24, 24), trimMat);
+                nozzle.position.y = -12 - exp * 6;
+                currentMeshGroup.add(nozzle);
+                partsList.push({ id: 2, name: 'نازل تمام‌گذر (Full Nozzle)', mat: 'ASTM A182 F316 / Stellite', std: 'API 526', color: 'border-cyan-400 text-cyan-300' });
+
+                const springBonnet = new THREE.Mesh(new THREE.CylinderGeometry(18, 22, 54, 24, 1, false, 0, cutaway ? Math.PI : Math.PI * 2), bonnetMat);
+                springBonnet.position.y = 38 + exp * 28;
+                currentMeshGroup.add(springBonnet);
+                const springCoil = new THREE.Mesh(new THREE.TorusGeometry(11, 2.2, 10, 24), stemMat);
+                springCoil.rotation.x = Math.PI / 2;
+                springCoil.position.y = 36 + exp * 28;
+                currentMeshGroup.add(springCoil);
+                partsList.push({ id: 3, name: 'فنر کالیبره، دیسک هولدر و بونت بسته (Calibrated Spring & Bonnet)', mat: 'Chrome-Silicon / Inconel X-750', std: 'ASME UV Stamp', color: 'border-amber-400 text-amber-300' });
+
+            } else {
+                // Plug / Needle / Manifold
+                const barrel = createHollowBarrel(20, 14, 58, bodyMat, cutaway);
+                currentMeshGroup.add(barrel);
+                if (specs.endConn === 'RF' || specs.endConn === 'RTJ') {
+                    const flgL = createAsmeFlange(34, 14, 7, 8, bodyMat, cutaway);
+                    flgL.position.x = -29 - exp * 12;
+                    currentMeshGroup.add(flgL);
+                    const flgR = createAsmeFlange(34, 14, 7, 8, bodyMat, cutaway);
+                    flgR.position.x = 29 + exp * 12;
+                    flgR.rotation.y = Math.PI;
+                    currentMeshGroup.add(flgR);
+                }
+                partsList.push({ id: 1, name: valveType === 'Plug' ? 'بدنه شیر مخروطی (API 599 Body)' : 'بدنه فورج/باراستاک ابزاردقیق (MSS SP-99)', mat: specs.material, std: valveType === 'Plug' ? 'API 599' : 'MSS SP-99', color: 'border-slate-400 text-slate-200' });
+
+                const plugCore = new THREE.Mesh(new THREE.CylinderGeometry(11, 15, 34, 24), trimMat);
+                plugCore.position.y = exp * 22;
+                currentMeshGroup.add(plugCore);
+                partsList.push({ id: 2, name: valveType === 'Plug' ? 'پلاگ مخروطی بالانس (Tapered Plug)' : 'سوزن مخروطی غیرچرخان (Non-Rotating Vee Tip)', mat: trimInfo.disc, std: 'Precision Ground', color: 'border-cyan-400 text-cyan-300' });
+
+                const stem = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 44, 16), stemMat);
+                stem.position.y = 32 + exp * 35;
+                currentMeshGroup.add(stem);
+                partsList.push({ id: 3, name: 'ساقه و گلند پکینگ (Stem & Packing)', mat: trimInfo.stem, std: 'Anti-Blowout', color: 'border-amber-400 text-amber-300' });
+
+                if (specs.operator !== 'BareStem') {
+                    const op = createOperatorAssembly(specs.operator, opMat, stemMat, boltMat);
+                    op.position.y = 54 + exp * 48;
+                    currentMeshGroup.add(op);
+                    partsList.push({ id: 4, name: `عملگر (${specs.operator})`, mat: 'Steel / SS316', std: 'Standard', color: 'border-emerald-400 text-emerald-300' });
+                }
+            }
+
+            // Render Detailed BOM Cards
+            const partsContainer = document.getElementById('partsListContainer');
+            if (partsContainer) {
+                partsContainer.innerHTML = partsList.map(part => `
+                    <div class="p-2.5 rounded-lg bg-slate-900/95 border border-slate-800 border-r-4 ${part.color} space-y-1">
+                        <div class="flex justify-between items-center gap-1">
+                            <span class="font-bold text-xs">${part.id}. ${part.name}</span>
+                            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-sky-300 whitespace-nowrap">${part.std}</span>
+                        </div>
+                        <div class="text-[11px] font-mono text-slate-300">
+                            <span class="text-slate-400">ASTM / Spec:</span> <strong class="text-white">${part.mat}</strong>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        /* ========================================================================= */
+        /* 8. 2D CROSS-SECTIONAL & GA SHOP DRAWING SVG                               */
+        /* ========================================================================= */
+        function renderBlueprintSVG() {
+            const container = document.getElementById('blueprintContainer');
+            if (!container) return;
+
+            const specs = calculateCurrentValveSpecs();
+            const trimInfo = API_TRIM_MATRIX[specs.trim] || API_TRIM_MATRIX[8];
+
+            let internalDrawing = '';
+            if (specs.type === 'Gate') {
+                internalDrawing = `
+                    <!-- Gate Valve Cross-Section -->
+                    <path d="M 135 95 L 185 95 L 195 75 L 275 75 L 285 95 L 335 95 L 335 185 L 285 185 L 275 195 L 195 195 L 185 185 L 135 185 Z" fill="rgba(51, 65, 85, 0.35)" stroke="#38bdf8" stroke-width="2"/>
+                    <!-- Seat Rings -->
+                    <rect x="208" y="102" width="7" height="76" fill="#f43f5e" opacity="0.85"/>
+                    <rect x="255" y="102" width="7" height="76" fill="#f43f5e" opacity="0.85"/>
+                    <!-- Flexible Wedge -->
+                    <polygon points="218,100 252,100 247,180 223,180" fill="rgba(56, 189, 248, 0.45)" stroke="#38bdf8" stroke-width="1.8"/>
+                    <!-- Bonnet & Yoke -->
+                    <rect x="190" y="65" width="90" height="10" fill="#475569" stroke="#94a3b8"/>
+                    <rect x="215" y="35" width="40" height="30" fill="rgba(71, 85, 105, 0.4)" stroke="#94a3b8" stroke-width="1.5"/>
+                    <!-- Rising Stem & Handwheel -->
+                    <rect x="231" y="16" width="8" height="84" fill="#fbbf24"/>
+                    <line x1="180" y1="22" x2="290" y2="22" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+                `;
+            } else if (specs.type === 'Ball') {
+                internalDrawing = `
+                    <!-- Ball Valve Split Body -->
+                    <rect x="145" y="85" width="180" height="110" rx="12" fill="rgba(51, 65, 85, 0.35)" stroke="#38bdf8" stroke-width="2"/>
+                    <line x1="195" y1="85" x2="195" y2="195" stroke="#94a3b8" stroke-dasharray="4,2"/>
+                    <line x1="275" y1="85" x2="275" y2="195" stroke="#94a3b8" stroke-dasharray="4,2"/>
+                    <!-- Ball & Bore -->
+                    <circle cx="235" cy="140" r="38" fill="rgba(56, 189, 248, 0.3)" stroke="#38bdf8" stroke-width="2"/>
+                    <rect x="197" y="116" width="76" height="48" fill="rgba(15, 23, 42, 0.7)" stroke="#38bdf8" stroke-dasharray="3,2"/>
+                    <!-- Seats -->
+                    <rect x="192" y="112" width="6" height="56" fill="#f43f5e"/>
+                    <rect x="272" y="112" width="6" height="56" fill="#f43f5e"/>
+                    <!-- Anti-Blowout Stem & Lever -->
+                    <rect x="229" y="36" width="12" height="66" fill="#fbbf24"/>
+                    <line x1="185" y1="36" x2="315" y2="36" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+                `;
+            } else if (specs.type === 'Butterfly') {
+                internalDrawing = `
+                    <!-- Butterfly Wafer/Lug Body -->
+                    <rect x="212" y="70" width="46" height="140" rx="4" fill="rgba(51, 65, 85, 0.45)" stroke="#38bdf8" stroke-width="2"/>
+                    <!-- Laminated Seat -->
+                    <rect x="222" y="76" width="6" height="128" fill="#f43f5e"/>
+                    <!-- Triple Offset Disc -->
+                    <line x1="235" y1="78" x2="235" y2="202" stroke="#38bdf8" stroke-width="6"/>
+                    <!-- Through Shaft & Gear -->
+                    <rect x="231" y="28" width="8" height="184" fill="#fbbf24"/>
+                    <rect x="215" y="22" width="40" height="18" rx="3" fill="#059669" stroke="#34d399"/>
+                `;
+            } else {
+                internalDrawing = `
+                    <!-- Globe / Check / General Cross-Section -->
+                    <ellipse cx="235" cy="140" rx="75" ry="55" fill="rgba(51, 65, 85, 0.35)" stroke="#38bdf8" stroke-width="2"/>
+                    <rect x="135" y="105" width="200" height="70" fill="rgba(51, 65, 85, 0.25)" stroke="#38bdf8" stroke-width="1.5"/>
+                    <!-- Horizontal Seat & Plug -->
+                    <rect x="210" y="138" width="50" height="6" fill="#f43f5e"/>
+                    <polygon points="215,120 255,120 248,138 222,138" fill="#38bdf8"/>
+                    <!-- Stem & Handwheel -->
+                    <rect x="231" y="26" width="8" height="94" fill="#fbbf24"/>
+                    <line x1="180" y1="26" x2="290" y2="26" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+                `;
+            }
+
+            const flangeSvg = (specs.endConn === 'RF' || specs.endConn === 'RTJ') ? `
+                <rect x="122" y="65" width="13" height="150" fill="rgba(56, 189, 248, 0.28)" stroke="#38bdf8" stroke-width="2"/>
+                <rect x="335" y="65" width="13" height="150" fill="rgba(56, 189, 248, 0.28)" stroke="#38bdf8" stroke-width="2"/>
+            ` : '';
+
+            const svg = `
+                <svg viewBox="0 0 820 290" class="w-full h-full">
+                    <!-- Centerlines -->
+                    <line x1="30" y1="140" x2="440" y2="140" stroke="#0284c7" stroke-width="1" stroke-dasharray="12,4,2,4"/>
+                    <line x1="235" y1="10" x2="235" y2="265" stroke="#0284c7" stroke-width="1" stroke-dasharray="12,4,2,4"/>
+                    
+                    ${flangeSvg}
+                    ${internalDrawing}
+
+                    <!-- Dimension Lines: Face-to-Face (ASME B16.10) -->
+                    <line x1="122" y1="242" x2="348" y2="242" stroke="#fbbf24" stroke-width="1.3"/>
+                    <line x1="122" y1="234" x2="122" y2="250" stroke="#fbbf24" stroke-width="1.3"/>
+                    <line x1="348" y1="234" x2="348" y2="250" stroke="#fbbf24" stroke-width="1.3"/>
+                    <text x="235" y="258" fill="#fbbf24" font-size="11" font-weight="bold" font-family="JetBrains Mono" text-anchor="middle">L (ASME B16.10 F2F) = ${specs.f2f} mm</text>
+
+                    <!-- Dimension Lines: Center-to-Top Height (H) -->
+                    <line x1="385" y1="22" x2="385" y2="140" stroke="#34d399" stroke-width="1.3"/>
+                    <line x1="378" y1="22" x2="392" y2="22" stroke="#34d399" stroke-width="1.3"/>
+                    <line x1="378" y1="140" x2="392" y2="140" stroke="#34d399" stroke-width="1.3"/>
+                    <text x="396" y="85" fill="#34d399" font-size="11" font-weight="bold" font-family="JetBrains Mono">H = ${specs.height} mm</text>
+
+                    <!-- Engineering Title & Metallurgy Block -->
+                    <rect x="495" y="14" width="310" height="262" rx="6" fill="rgba(15, 23, 42, 0.92)" stroke="#334155" stroke-width="1.5"/>
+                    <text x="650" y="36" fill="#38bdf8" font-size="11" font-weight="bold" font-family="JetBrains Mono" text-anchor="middle">GENERAL ARRANGEMENT & METALLURGY</text>
+                    <line x1="505" y1="44" x2="795" y2="44" stroke="#334155"/>
+                    <text x="508" y="64" fill="#fbbf24" font-size="10.5" font-weight="bold" font-family="JetBrains Mono">TAG: ${specs.tag} | LINE: ${specs.line}</text>
+                    <text x="508" y="84" fill="#e2e8f0" font-size="10.5" font-family="JetBrains Mono">VALVE: ${specs.type.toUpperCase()} ${specs.size}" ASME CL${specs.pClass}#</text>
+                    <text x="508" y="104" fill="#e2e8f0" font-size="10.5" font-family="JetBrains Mono">ENDS: ${specs.endConn} (${specs.flangeBolts})</text>
+                    <text x="508" y="124" fill="#38bdf8" font-size="10.5" font-family="JetBrains Mono">BODY: ${specs.material}</text>
+                    <text x="508" y="144" fill="#38bdf8" font-size="10.5" font-family="JetBrains Mono">STEM: ${trimInfo.stem}</text>
+                    <text x="508" y="164" fill="#38bdf8" font-size="10.5" font-family="JetBrains Mono">DISC/SEAT: ${trimInfo.disc} / ${trimInfo.seat}</text>
+                    <text x="508" y="184" fill="#f43f5e" font-size="10" font-family="JetBrains Mono">SEAL: ${specs.seatMat}</text>
+                    <line x1="505" y1="196" x2="795" y2="196" stroke="#334155"/>
+                    <text x="508" y="216" fill="#34d399" font-size="10.5" font-family="JetBrains Mono">MAWP @ ${specs.temp}°C: ${specs.mawp.toFixed(1)} Bar</text>
+                    <text x="508" y="236" fill="#cbd5e1" font-size="10.5" font-family="JetBrains Mono">HYDRO SHELL/SEAT: ${specs.hydroTest.toFixed(1)} / ${specs.seatTest.toFixed(1)} Bar</text>
+                    <text x="508" y="256" fill="#fbbf24" font-size="10.5" font-weight="bold" font-family="JetBrains Mono">NET WEIGHT: ${specs.weight.toFixed(1)} kg</text>
+                </svg>
+            `;
+            container.innerHTML = svg;
+        }
+
+        /* ========================================================================= */
+        /* 9. HYDRAULIC SIZING (ISA / IEC 60534)                                     */
+        /* ========================================================================= */
+        function calculateHydraulicSizing() {
+            const specs = calculateCurrentValveSpecs();
+            const phase = document.getElementById('szPhase').value;
+            const Q = parseFloat(document.getElementById('szFlow').value) || 50;
+            const sg = parseFloat(document.getElementById('szSG').value) || 1.0;
+            const P1 = parseFloat(document.getElementById('szP1').value) || 10;
+            const P2 = parseFloat(document.getElementById('szP2').value) || 9;
+            const Pv = parseFloat(document.getElementById('szPv').value) || 0.2;
+            const FL = parseFloat(document.getElementById('szFL').value) || 0.85;
+            const openPct = parseFloat(document.getElementById('openPercentage').value) / 100.0;
+
+            const dP = Math.max(0.05, P1 - P2);
+            const Ff = 0.96 - 0.28 * Math.sqrt(Pv / 221.2);
+            const dPMax = Math.pow(FL, 2) * (P1 - Ff * Pv);
+            const effectiveDp = Math.min(dP, Math.max(0.05, dPMax));
+
+            let reqKv = Q * Math.sqrt(sg / effectiveDp);
+            if (phase === 'gas') {
+                reqKv = (Q / 285) * Math.sqrt((sg * 293) / (effectiveDp * P1));
+            }
+            const reqCv = reqKv * 1.156;
+
+            const openFactor = specs.type === 'Globe' ? Math.pow(openPct, 1.6) : Math.sin(openPct * Math.PI / 2);
+            const availCv = Math.max(1, specs.fullCv * openFactor);
+            const utilization = Math.min(999, (reqCv / availCv) * 100);
+
+            const areaM2 = Math.PI * Math.pow((specs.size * 0.0254) / 2, 2);
+            const velocity = (Q / 3600) / Math.max(0.0001, areaM2);
+            const sigma = (P1 - Pv) / dP;
+
+            document.getElementById('szReqCv').innerText = reqCv.toFixed(1);
+            document.getElementById('szAvailCv').innerText = availCv.toFixed(1);
+            document.getElementById('szVelocity').innerText = velocity.toFixed(1) + ' m/s';
+            document.getElementById('szSigma').innerText = sigma.toFixed(2);
+            document.getElementById('szDpMax').innerText = dPMax.toFixed(2) + ' Bar';
+            document.getElementById('szUtilization').innerText = utilization.toFixed(1) + '%';
+
+            const cavBadge = document.getElementById('szCavitationBadge');
+            const recText = document.getElementById('szRecommendation');
+
+            if (dP >= dPMax || sigma < 1.5) {
+                cavBadge.className = 'px-2.5 py-0.5 rounded text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+                cavBadge.innerText = 'خطر کاویتاسیون شدید / Choked Flow!';
+                recText.innerHTML = `<span class="text-rose-400 font-bold">تحلیل هیدرولیک:</span> شاخص کاویتاسیون پایین است. استفاده از تریم ضدکاویتاسیون چندمرحله‌ای (Multi-Stage Anti-Cavitation Cage) یا سخت‌کاری TCC الزامی است.`;
+            } else if (utilization > 85) {
+                cavBadge.className = 'px-2.5 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                cavBadge.innerText = 'ظرفیت نزدیک به اشباع';
+                recText.innerHTML = `<span class="text-amber-300 font-bold">تحلیل هیدرولیک:</span> شیر در ${utilization.toFixed(0)}% ظرفیت جریان کار می‌کند. انتخاب یک سایز بالاتر توصیه می‌شود.`;
+            } else {
+                cavBadge.className = 'px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+                cavBadge.innerText = 'عملکرد هیدرولیک بهینه (Safe)';
+                recText.innerHTML = `<span class="text-emerald-400 font-bold">تاییدیه هیدرولیک:</span> سایز ${specs.size}" برای دبی ${Q} m³/h مناسب است و سرعت سیال (${velocity.toFixed(1)} m/s) در محدوده ایمن قرار دارد.`;
+            }
+
+            const ctx = document.getElementById('cvCurveChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                const labels = ['10%', '20%', '30%', '40%', '50%', '60%', '70%', '80%', '90%', '100%'];
+                const dataPoints = labels.map((_, idx) => {
+                    const p = (idx + 1) * 0.1;
+                    const f = specs.type === 'Globe' ? Math.pow(p, 1.6) : Math.sin(p * Math.PI / 2);
+                    return Math.round(specs.fullCv * f);
+                });
+                const reqLine = labels.map(() => Math.round(reqCv));
+
+                if (cvChart) cvChart.destroy();
+                cvChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'منحنی ظرفیت Cv شیر', data: dataPoints, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.15)', fill: true, tension: 0.35 },
+                            { label: 'Cv مورد نیاز خط', data: reqLine, borderColor: '#f59e0b', borderDash: [5, 5], pointRadius: 0 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#cbd5e1', font: { family: 'Vazirmatn', size: 11 } } } },
+                        scales: {
+                            x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.3)' } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.3)' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        /* ========================================================================= */
+        /* 10. FORMATTERS, CBS, MTO & DATASHEET                                      */
+        /* ========================================================================= */
+        function formatCurrency(amountUSD, toCurr, fxUsdIrt, fxEurUsd) {
+            let converted = amountUSD;
+            if (toCurr === 'EUR') converted = amountUSD / fxEurUsd;
+            else if (toCurr === 'IRT') converted = amountUSD * fxUsdIrt;
+            else if (toCurr === 'IRR') converted = amountUSD * fxUsdIrt * 10;
+
+            if (toCurr === 'USD') return '$' + converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (toCurr === 'EUR') return '€' + converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (toCurr === 'IRT') return Math.round(converted).toLocaleString('en-US') + ' تومان';
+            if (toCurr === 'IRR') return Math.round(converted).toLocaleString('en-US') + ' ریال';
+        }
+
+        function renderCBSList(cb, totalUSD) {
+            const container = document.getElementById('cbsBreakdownList');
+            if (!container) return;
+
+            const items = [
+                { label: 'متالورژی بدنه (ریخته‌گری/فورج) و تریم داخلی', value: cb.rawMaterial, color: 'text-sky-400', hex: '#38bdf8' },
+                { label: 'عملگر / اکچوییتور و تجهیزات کنترلی', value: cb.actuator, color: 'text-purple-400', hex: '#c084fc' },
+                { label: 'ماشین‌کاری CNC، Hardfacing و تست NDT', value: cb.machining, color: 'text-cyan-400', hex: '#22d3ee' },
+                { label: 'مهندسی، مدارک MDR/VDRL و سود سازنده', value: cb.profit, color: 'text-emerald-400', hex: '#34d399' },
+                { label: 'بسته‌بندی صادراتی، حمل و گمرک', value: cb.freight, color: 'text-amber-400', hex: '#fbbf24' },
+                { label: 'مالیات بر ارزش افزوده (VAT)', value: cb.vat, color: 'text-rose-400', hex: '#fb7185' }
+            ];
+
+            container.innerHTML = items.map(item => {
+                const pct = ((item.value / Math.max(0.01, totalUSD)) * 100).toFixed(1);
+                return `
+                    <div class="flex justify-between items-center p-2.5 rounded-lg bg-slate-900/75 border border-slate-800">
+                        <span class="text-slate-300 font-vazir">${item.label}:</span>
+                        <div class="text-left font-mono">
+                            <span class="${item.color} font-bold">$${item.value.toFixed(2)}</span>
+                            <span class="text-[10px] text-slate-400 mr-1.5 bg-slate-800 px-1.5 py-0.5 rounded">(${pct}%)</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const chartCtx = document.getElementById('cbsDoughnutChart');
+            if (chartCtx && typeof Chart !== 'undefined') {
+                if (cbsChart) cbsChart.destroy();
+                cbsChart = new Chart(chartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['متالورژی و بدنه', 'عملگر', 'ماشین‌کاری و تست', 'مهندسی و سود', 'حمل و گمرک', 'مالیات'],
+                        datasets: [{ data: items.map(x => Number(x.value.toFixed(2))), backgroundColor: items.map(x => x.hex), borderWidth: 1, borderColor: '#0f172a' }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        }
+
+        function addCurrentValveToMTO() {
+            const specs = calculateCurrentValveSpecs();
+            mtoItems.push({
+                id: Date.now() + Math.random(),
+                tag: specs.tag,
+                type: specs.type,
+                subType: specs.subType,
+                size: specs.size,
+                pClass: specs.pClass,
+                material: specs.material,
+                trim: specs.trim,
+                seatMat: specs.seatMat,
+                endConn: specs.endConn,
+                operator: specs.operator,
+                f2f: specs.f2f,
+                qty: specs.qty,
+                unitWeight: specs.weight,
+                unitPriceUSD: specs.unitPriceUSD
+            });
+            renderMTOTable();
+        }
+
+        function loadSampleProjectMTO() {
+            mtoItems = [
+                { id: 101, tag: 'XV-101A', type: 'Ball', subType: 'API 6D Trunnion Mounted 3-Piece', size: 12, pClass: 600, material: 'A352-LCC', trim: 12, seatMat: 'Devlon', endConn: 'RTJ', operator: 'Pneumatic-SR', f2f: 838, qty: 4, unitWeight: 740, unitPriceUSD: 9850 },
+                { id: 102, tag: 'HV-204', type: 'Gate', subType: 'API 600 Flexible Wedge OS&Y', size: 8, pClass: 300, material: 'A216-WCB', trim: 8, seatMat: 'MetalStellite', endConn: 'RF', operator: 'Gear', f2f: 419, qty: 10, unitWeight: 285, unitPriceUSD: 2640 },
+                { id: 103, tag: 'BFV-301', type: 'Butterfly', subType: 'API 609 Triple Offset TOV', size: 20, pClass: 150, material: 'A890-5A', trim: 19, seatMat: 'MetalStellite', endConn: 'Lug', operator: 'Electric-MOV', f2f: 127, qty: 3, unitWeight: 510, unitPriceUSD: 14200 },
+                { id: 104, tag: 'CKV-112', type: 'Check', subType: 'API 594 Dual Plate Wafer', size: 10, pClass: 600, material: 'A890-4A', trim: 12, seatMat: 'MetalStellite', endConn: 'Wafer', operator: 'BareStem', f2f: 117, qty: 6, unitWeight: 195, unitPriceUSD: 4680 },
+                { id: 105, tag: 'PSV-501', type: 'PSV', subType: 'API 526 Balanced Bellows', size: 4, pClass: 900, material: 'A217-WC6', trim: 5, seatMat: 'MetalStellite', endConn: 'RF', operator: 'BareStem', f2f: 457, qty: 2, unitWeight: 155, unitPriceUSD: 5290 }
+            ];
+            renderMTOTable();
+        }
+
+        function renderMTOTable() {
+            const tbody = document.getElementById('mtoTableBody');
+            if (!tbody) return;
+
+            const activeCurr = document.getElementById('activeCurrency').value;
+            const fxUsdIrt = parseFloat(document.getElementById('fxUsdIrt').value) || 68000;
+            const fxEurUsd = parseFloat(document.getElementById('fxEurUsd').value) || 1.08;
+            const secCurr = activeCurr === 'IRT' ? 'USD' : 'IRT';
+
+            if (mtoItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="p-8 text-center text-slate-500 font-vazir">جدول MTO خالی است. شیر مورد نظر را در تب اول پیکربندی کرده و به لیست اضافه کنید.</td></tr>`;
+                document.getElementById('mtoItemCount').innerText = '0 ردیف';
+                document.getElementById('navMtoBadge').innerText = '0';
+                document.getElementById('mtoTotalQty').innerText = '0';
+                document.getElementById('mtoTotalWeight').innerText = '0 kg';
+                document.getElementById('mtoAvgPerKg').innerText = '$0.0/kg';
+                document.getElementById('mtoGrandTotalDisplay').innerText = formatCurrency(0, activeCurr, fxUsdIrt, fxEurUsd);
+                document.getElementById('mtoGrandTotalSecondary').innerText = formatCurrency(0, secCurr, fxUsdIrt, fxEurUsd);
+                return;
+            }
+
+            let totalQty = 0, totalWeight = 0, grandTotalUSD = 0;
+
+            tbody.innerHTML = mtoItems.map((item, index) => {
+                totalQty += item.qty;
+                const rowWeight = item.unitWeight * item.qty;
+                totalWeight += rowWeight;
+                const rowPriceUSD = item.unitPriceUSD * item.qty;
+                grandTotalUSD += rowPriceUSD;
+
+                return `
+                    <tr class="${index % 2 === 0 ? 'bg-slate-900/30' : 'bg-slate-900/65'} hover:bg-slate-800/50 transition">
+                        <td class="p-2.5">${index + 1}</td>
+                        <td class="p-2.5 text-amber-300 font-bold">${item.tag}</td>
+                        <td class="p-2.5 text-brand-accent font-bold">${item.type}</td>
+                        <td class="p-2.5">${item.size}"</td>
+                        <td class="p-2.5">CL ${item.pClass}</td>
+                        <td class="p-2.5 text-[11px]">${item.material} / T${item.trim} / ${item.seatMat}</td>
+                        <td class="p-2.5 text-[11px]">${item.endConn} / ${item.operator}</td>
+                        <td class="p-2.5 text-center">${item.f2f}</td>
+                        <td class="p-2.5 text-center">${rowWeight.toFixed(1)}</td>
+                        <td class="p-2.5 text-center">
+                            <input type="number" min="1" value="${item.qty}" onchange="updateMtoQty(${item.id}, this.value)" class="w-12 bg-slate-950 border border-slate-700 rounded text-center text-white py-0.5 font-mono">
+                        </td>
+                        <td class="p-2.5">${formatCurrency(item.unitPriceUSD, activeCurr, fxUsdIrt, fxEurUsd)}</td>
+                        <td class="p-2.5 text-emerald-400 font-bold">${formatCurrency(rowPriceUSD, activeCurr, fxUsdIrt, fxEurUsd)}</td>
+                        <td class="p-2.5 text-center">
+                            <button onclick="deleteMtoItem(${item.id})" class="text-rose-400 hover:text-rose-300 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('mtoItemCount').innerText = `${mtoItems.length} ردیف`;
+            document.getElementById('navMtoBadge').innerText = mtoItems.length;
+            document.getElementById('mtoTotalQty').innerText = `${totalQty} عدد`;
+            document.getElementById('mtoTotalWeight').innerText = `${totalWeight.toFixed(1)} kg`;
+            document.getElementById('mtoAvgPerKg').innerText = `$${(grandTotalUSD / Math.max(1, totalWeight)).toFixed(1)}/kg`;
+            document.getElementById('mtoGrandTotalDisplay').innerText = formatCurrency(grandTotalUSD, activeCurr, fxUsdIrt, fxEurUsd);
+            document.getElementById('mtoGrandTotalSecondary').innerText = formatCurrency(grandTotalUSD, secCurr, fxUsdIrt, fxEurUsd);
+        }
+
+        function updateMtoQty(id, newQty) {
+            const item = mtoItems.find(x => x.id === id);
+            if (item) { item.qty = Math.max(1, parseInt(newQty) || 1); renderMTOTable(); }
+        }
+        function deleteMtoItem(id) { mtoItems = mtoItems.filter(x => x.id !== id); renderMTOTable(); }
+        function clearMtoTable() { mtoItems = []; renderMTOTable(); }
+
+        function saveProjectToJSON() {
+            const data = { currentValve: calculateCurrentValveSpecs(), mtoItems, timestamp: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ValvePro_v8_Project_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadProjectFromJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.mtoItems) { mtoItems = data.mtoItems; renderMTOTable(); }
+                } catch (err) { alert('فایل JSON معتبر نیست.'); }
+            };
+            reader.readAsText(file);
+        }
+
+        function exportToExcelFull() {
+            if (typeof XLSX === 'undefined') return;
+            const listToExport = mtoItems.length > 0 ? mtoItems : [calculateCurrentValveSpecs()];
+            const fxUsdIrt = parseFloat(document.getElementById('fxUsdIrt').value) || 68000;
+
+            const data = listToExport.map((item, idx) => {
+                const trimInfo = API_TRIM_MATRIX[item.trim] || API_TRIM_MATRIX[8];
+                return {
+                    'Item #': idx + 1,
+                    'Tag No': item.tag || `V-${idx + 1}`,
+                    'Valve Type': item.type,
+                    'Design Standard': item.subType,
+                    'Size (NPS)': item.size,
+                    'ASME Class': item.pClass,
+                    'Body Material (ASTM)': item.material,
+                    'API Trim': `Trim ${item.trim}`,
+                    'Stem Material': trimInfo.stem,
+                    'Disc / Seat Material': `${trimInfo.disc} / ${trimInfo.seat}`,
+                    'Seal / Seat Spec': item.seatMat,
+                    'End Connection': item.endConn,
+                    'Operator': item.operator,
+                    'ASME B16.10 F2F (mm)': item.f2f,
+                    'Qty': item.qty,
+                    'Unit Weight (kg)': Number((item.unitWeight || item.weight || 0).toFixed(1)),
+                    'Total Weight (kg)': Number(((item.unitWeight || item.weight || 0) * item.qty).toFixed(1)),
+                    'Unit Price (USD)': Number(item.unitPriceUSD.toFixed(2)),
+                    'Total Price (USD)': Number((item.unitPriceUSD * item.qty).toFixed(2)),
+                    'Total Price (Toman)': Math.round(item.unitPriceUSD * item.qty * fxUsdIrt)
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Valve_MTO_Metallurgy");
+            XLSX.writeFile(wb, `ValvePro_MR_MTO_${Date.now()}.xlsx`);
+        }
+
+        function handleMtoExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file || typeof XLSX === 'undefined') return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    if (jsonData.length > 0) {
+                        mtoItems = jsonData.map((row, idx) => ({
+                            id: Date.now() + idx,
+                            tag: row['Tag No'] || `V-${idx + 1}`,
+                            type: row['Valve Type'] || 'Gate',
+                            subType: row['Design Standard'] || 'API 600',
+                            size: parseFloat(row['Size (NPS)'] || 6),
+                            pClass: parseInt(row['ASME Class'] || 300),
+                            material: row['Body Material (ASTM)'] || 'A216-WCB',
+                            trim: 8,
+                            seatMat: row['Seal / Seat Spec'] || 'MetalStellite',
+                            endConn: row['End Connection'] || 'RF',
+                            operator: row['Operator'] || 'Handwheel',
+                            f2f: parseInt(row['ASME B16.10 F2F (mm)'] || 403),
+                            qty: parseInt(row['Qty'] || 1),
+                            unitWeight: parseFloat(row['Unit Weight (kg)'] || 165),
+                            unitPriceUSD: parseFloat(row['Unit Price (USD)'] || 1850)
+                        }));
+                        renderMTOTable();
+                    }
+                } catch (err) { alert('خطا در خواندن فایل اکسل.'); }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function openDatasheetModal() {
+            const specs = calculateCurrentValveSpecs();
+            const catInfo = VALVE_CATALOG[specs.type] || { std: 'ASME B16.34', vendors: 'Approved AVL' };
+            const trimInfo = API_TRIM_MATRIX[specs.trim] || API_TRIM_MATRIX[8];
+            const fxUsdIrt = parseFloat(document.getElementById('fxUsdIrt').value) || 68000;
+
+            document.getElementById('datasheetContent').innerHTML = `
+                <div class="border border-slate-700 rounded-xl p-5 bg-slate-900/75 space-y-5">
+                    <div class="flex flex-wrap justify-between items-start border-b border-slate-700 pb-3 gap-2">
+                        <div>
+                            <div class="text-[10px] text-sky-400 font-bold">OIL & GAS PIPING MATERIAL REQUISITION (MR) — VALVE DATASHEET</div>
+                            <h2 class="text-xl font-black text-white mt-0.5">${specs.tag} — ${specs.type.toUpperCase()} VALVE ${specs.size}" CLASS ${specs.pClass}#</h2>
+                            <p class="text-slate-400 text-xs mt-1">${specs.subType}</p>
+                        </div>
+                        <div class="text-left">
+                            <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">FOR PURCHASE / RFQ</span>
+                            <div class="text-[11px] text-slate-400 mt-1">Line: ${specs.line}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <div class="text-sky-400 font-bold border-b border-slate-800 pb-1">1. PROCESS & DESIGN CODE</div>
+                            <div class="flex justify-between"><span>Design & Mfg Standard:</span><span class="text-white font-bold">${catInfo.std}</span></div>
+                            <div class="flex justify-between"><span>Fluid Service:</span><span class="text-white">${specs.fluid}</span></div>
+                            <div class="flex justify-between"><span>Operating Press / Temp:</span><span class="text-white">${specs.opPress} Bar @ ${specs.temp} °C</span></div>
+                            <div class="flex justify-between"><span>ASME B16.34 Group & MAWP:</span><span class="text-emerald-400 font-bold">${specs.matGroup} / ${specs.mawp.toFixed(1)} Bar</span></div>
+                            <div class="flex justify-between"><span>API 598 Shell / Seat Test:</span><span class="text-amber-400">${specs.hydroTest.toFixed(1)} / ${specs.seatTest.toFixed(1)} Bar</span></div>
+                            <div class="flex justify-between"><span>Approved Vendors (AVL):</span><span class="text-slate-200">${catInfo.vendors}</span></div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="text-sky-400 font-bold border-b border-slate-800 pb-1">2. METALLURGY & TRIM SPECIFICATION</div>
+                            <div class="flex justify-between"><span>Body / Bonnet Material:</span><span class="text-white font-bold">${specs.material} (${specs.bonnet})</span></div>
+                            <div class="flex justify-between"><span>API Trim Designation:</span><span class="text-amber-300 font-bold">${trimInfo.name}</span></div>
+                            <div class="flex justify-between"><span>Stem Material:</span><span class="text-white">${trimInfo.stem}</span></div>
+                            <div class="flex justify-between"><span>Disc / Wedge / Ball:</span><span class="text-white">${trimInfo.disc}</span></div>
+                            <div class="flex justify-between"><span>Seat Ring / Facing:</span><span class="text-white">${trimInfo.seat} (${specs.seatMat})</span></div>
+                            <div class="flex justify-between"><span>Body-Bonnet Gasket:</span><span class="text-white">${trimInfo.gasket}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800">
+                        <div class="p-2.5 bg-slate-950 rounded border border-slate-800">ASME B16.10 F2F: <span class="text-white font-bold block">${specs.f2f} mm</span></div>
+                        <div class="p-2.5 bg-slate-950 rounded border border-slate-800">ASME B16.5 Flange: <span class="text-white font-bold block">${specs.flangeBolts}</span></div>
+                        <div class="p-2.5 bg-slate-950 rounded border border-slate-800">Unit Net Weight: <span class="text-white font-bold block">${specs.weight.toFixed(1)} kg</span></div>
+                        <div class="p-2.5 bg-slate-950 rounded border border-slate-800">Est. Unit Price: <span class="text-emerald-400 font-bold block">$${specs.unitPriceUSD.toFixed(2)} (${Math.round(specs.unitPriceUSD * fxUsdIrt).toLocaleString()} T)</span></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('datasheetModal').classList.remove('hidden');
+        }
+
+        function closeDatasheetModal() {
+            document.getElementById('datasheetModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
